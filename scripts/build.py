@@ -18,6 +18,7 @@ from pathlib import Path
 import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import shots  # noqa: E402
 import sources  # noqa: E402
 import svg  # noqa: E402
 
@@ -26,7 +27,22 @@ ASSETS = ROOT / "assets"
 MODES = ("dark", "light")
 
 NAV = [("About", "◆", "about-me"), ("Projects", "▣", "featured-projects"),
-       ("Stats", "▲", "live-stats"), ("Contact", "✦", "get-in-touch")]
+       ("Activity", "▦", "activity"), ("Stats", "▲", "live-stats"), ("Contact", "✦", "get-in-touch")]
+
+SHOWCASE_VIEWPORT = (452, 244)   # svg.showcase_card browser viewport
+GALLERY_VIEWPORT = (300, 148)    # svg.gallery_card browser viewport
+
+
+def load_shots(f, handle: str, repo: str, paths: list[str], size: tuple[int, int]) -> list[str]:
+    out = []
+    for path in paths or []:
+        data = f.get_bytes(f"https://raw.githubusercontent.com/{handle}/{repo}/HEAD/{path.lstrip('/')}")
+        uri = shots.fit(data, *size) if data else None
+        if uri:
+            out.append(uri)
+        else:
+            print(f"  ! screenshot unavailable: {repo}/{path}")
+    return out
 
 
 def write(path: Path, text: str) -> None:
@@ -84,6 +100,10 @@ def main() -> int:
     cf = sources.codeforces(f, cfg["codeforces"]) if cfg.get("codeforces") else None
     contrib = sources.github_contributions(f, handle)
     langs = sources.github_languages(f, handle, repos or [], set(cfg.get("languages_ignore") or []))
+    events = sources.github_events(f, handle) if cfg.get("activity") else None
+    featured_names = [r["name"] for it in cfg.get("featured") or []
+                      if (r := by_name.get(str(it["repo"]).lower()))]
+    traffic = sources.repo_traffic(handle, featured_names, ROOT / "data" / "traffic.json")
 
     v: dict[str, str] = {}
 
@@ -98,7 +118,8 @@ def main() -> int:
     # ── nav ──
     sections_present = {"featured-projects": bool(cfg.get("featured")),
                         "get-in-touch": any((cfg.get("links") or {}).values()),
-                        "about-me": bool(cfg.get("about"))}
+                        "about-me": bool(cfg.get("about")),
+                        "activity": bool(cfg.get("activity"))}
     nav = []
     for label, glyph, anchor in NAV:
         if not sections_present.get(anchor, True):
@@ -107,6 +128,18 @@ def main() -> int:
             write(ASSETS / "nav" / f"{slug(label)}-{m}.svg", svg.pill(label, glyph, pal[m]))
         nav.append(f'<a href="#{anchor}">{picture(f"assets/nav/{slug(label)}", label)}</a>')
     v["nav"] = '<p align="center">\n' + "&nbsp;\n".join(nav) + "\n</p>"
+
+    # ── live badges (count on every page load, so they can't be pre-drawn) ──
+    badges = []
+    acc = pal["dark"]["accent"].lstrip("#")
+    acc2 = pal["dark"]["accent2"].lstrip("#")
+    if cfg.get("views_counter"):
+        badges.append(f'<img src="https://komarev.com/ghpvc/?username={handle}&label=Profile%20views&color={acc}&style=flat-square" alt="Profile views">')
+    badges.append(f'<a href="{gh}?tab=followers"><img src="https://img.shields.io/github/followers/{handle}?label=Followers&style=flat-square&color={acc2}" alt="Followers"></a>')
+    badges.append(f'<a href="{gh}?tab=repositories"><img src="https://img.shields.io/github/stars/{handle}?affiliations=OWNER&label=Stars&style=flat-square&color={acc}" alt="Stars"></a>')
+    if cfg.get("codeforces"):
+        badges.append(f'<a href="https://codeforces.com/profile/{cfg["codeforces"]}"><img src="https://img.shields.io/badge/Codeforces-{cfg["codeforces"]}-{acc2}?style=flat-square" alt="Codeforces"></a>')
+    v["badges"] = '<p align="center">\n' + "\n".join(badges) + "\n</p>"
 
     # ── about ──
     about = list(cfg.get("about") or [])
@@ -134,8 +167,12 @@ def main() -> int:
         r = by_name.get(str(item["repo"]).lower())
         base = f"assets/projects/{slug(item['repo'])}"
         if r:
+            imgs = load_shots(f, handle, r["name"], item.get("shots"), SHOWCASE_VIEWPORT)
+            views = (traffic.get(r["name"]) or {}).get("total")
             for m in MODES:
-                write(ROOT / f"{base}-{m}.svg", svg.project_card(r, item, pal[m], i))
+                card = (svg.showcase_card(r, item, imgs, pal[m], handle, i, views) if imgs
+                        else svg.project_card(r, item, pal[m], i))
+                write(ROOT / f"{base}-{m}.svg", card)
         elif not (ROOT / f"{base}-dark.svg").exists():
             print(f"  ! featured repo not found: {item['repo']}")
             continue
@@ -144,6 +181,39 @@ def main() -> int:
     if cards:
         v["featured"] = "\n\n".join(f'<p align="center">\n{cards[i]}\n{cards[i + 1] if i + 1 < len(cards) else ""}\n</p>'
                                      for i in range(0, len(cards), 2))
+
+    # ── gallery ──
+    thumbs = []
+    for item in cfg.get("gallery") or []:
+        r = by_name.get(str(item["repo"]).lower())
+        if not r:
+            continue
+        imgs = load_shots(f, handle, r["name"], item.get("shots"), GALLERY_VIEWPORT)
+        if not imgs:
+            continue
+        base = f"assets/gallery/{slug(r['name'])}"
+        if any(t.startswith(f'<a href="{gh}/{r["name"]}"') for t in thumbs):
+            base += "-2"
+        for m in MODES:
+            write(ROOT / f"{base}-{m}.svg", svg.gallery_card(r, imgs, pal[m], handle, item.get("caption", "")))
+        thumbs.append(f'<a href="{gh}/{r["name"]}">{picture(base, r["name"], "32%")}</a>')
+    if thumbs:
+        v["gallery"] = "\n\n".join('<p align="center">\n' + "\n".join(thumbs[i:i + 3]) + "\n</p>"
+                                    for i in range(0, len(thumbs), 3))
+
+    # ── activity ──
+    if cfg.get("activity") and contrib and contrib.get("days"):
+        for m in MODES:
+            write(ASSETS / f"heatmap-{m}.svg", svg.heatmap_card(contrib, pal[m]))
+            write(ASSETS / f"rhythm-{m}.svg", svg.rhythm_card(contrib, pal[m]))
+            if events is not None:
+                write(ASSETS / f"activity-{m}.svg", svg.activity_card(events, pal[m]))
+        pair = [f'<a href="{gh}?tab=overview">{picture("assets/activity", "Recent activity", "49%")}</a>']
+        if not (ASSETS / "activity-dark.svg").exists():
+            pair = []
+        pair.append(picture("assets/rhythm", "Coding rhythm by weekday", "49%"))
+        v["activity"] = (f'<p align="center"><a href="{gh}">{picture("assets/heatmap", "Contribution heatmap", "98%")}</a></p>\n\n'
+                         '<p align="center">\n' + "\n".join(pair) + "\n</p>")
 
     # ── all projects ──
     if repos:
@@ -184,6 +254,9 @@ def main() -> int:
              "streak": contrib and contrib["streak"],
              "repos": len(repos) if repos is not None else None,
              "stars": sum(r.get("stargazers_count", 0) for r in repos) if repos is not None else None}
+    if traffic:
+        stats["views"] = sum(t["total"] for t in traffic.values())
+        stats["views_since"] = min((t["since"] for t in traffic.values() if t["since"]), default=None)
     if repos is not None or not (ASSETS / "stats-dark.svg").exists():
         for m in MODES:
             write(ASSETS / f"stats-{m}.svg", svg.stats_card(stats, langs, pal[m]))

@@ -37,27 +37,52 @@ start_here:
     repo: DocMind
     why: Ask your PDFs questions, get answers with page citations
 
-# Big cards. `title` and `stack` are optional overrides.
+# Big cards with a screenshot slideshow in a browser frame.
+# `shots` are paths inside that repo (cycled every few seconds); without
+# them the card falls back to a text-only design. `title`, `stack`, `tag`
+# are optional.
 featured:
   - repo: weave
+    shots: [docs/screenshots/landing-dark.png, docs/screenshots/editor-two-cursors.png, docs/screenshots/editor-dark.png]
     stack: [TypeScript, React, Node, Postgres]
     tag: Real-time
   - repo: floodwatch-ctg
+    shots: [docs/screenshots/desktop-dark.png, docs/screenshots/heavy-rain-dark.png, docs/screenshots/mobile-bangla.png]
     stack: [FastAPI, PostGIS, React, Telegram]
     tag: Geo
   - repo: upsolve
+    shots: [docs/screenshots/plan-dark.png, docs/screenshots/skill-profile.png, docs/screenshots/profile.png]
     stack: [FastAPI, React, PostgreSQL, Redis]
     tag: Algorithms
   - repo: Service_Technician_Finder_Project
+    shots: [docs/screenshots/customer/01-dashboard.png, docs/screenshots/customer/05-live-tracking.png, docs/screenshots/admin/01-overview.png]
     title: Technician Finder
     stack: [React, TypeScript, PostGIS, Socket.IO]
     tag: Marketplace
   - repo: DocMind
+    shots: [docs/screenshots/03-chat-citations.png, docs/screenshots/02-documents-library.png, docs/screenshots/01-login-screen.png]
     stack: [Python, RAG, FastAPI]
     tag: AI
   - repo: ArborVision
+    shots: [docs/screenshots/01-platform-home.png, docs/screenshots/03-compare-results.png, docs/screenshots/02-upload-run.png]
     stack: [Python, PyTorch, OpenCV]
     tag: Vision
+
+# "In pictures" strip: smaller screenshot thumbnails of more projects.
+gallery:
+  - repo: LeafCheck
+    shots: [docs/screenshots/02-prediction.png, docs/screenshots/03-bangla.png]
+  - repo: Stratum
+    shots: [docs/screenshots/02-kanban-board.png, docs/screenshots/03-analytics-dashboard.png]
+  - repo: SplitMate
+    shots: [docs/screenshots/03_group_dashboard.png, docs/screenshots/07_balances.png]
+  - repo: ShopDesk
+    shots: [docs/screenshots/02-pos-cart.png, docs/screenshots/04-daily-report.png]
+  - repo: PocketLedger
+    shots: [docs/screenshots/dashboard.png, docs/screenshots/transactions.png]
+  - repo: floodwatch-ctg
+    shots: [docs/screenshots/mobile-light.png, docs/screenshots/area-light.png]
+    caption: Bangla/English mobile flood reports
 
 # Every repo, grouped. Repos not listed land in "More".
 categories:
@@ -78,6 +103,8 @@ descriptions:
 # Icon ids from https://skillicons.dev
 skills: [py, ts, js, c, cpp, react, nodejs, fastapi, django, postgres, redis, docker, linux, git, tailwind, pytorch]
 
+activity: true                       # heatmap + recent activity + weekly rhythm
+views_counter: true                  # live "profile views" badge (komarev.com)
 codeforces: arafatsheikh098           # "" to hide the Codeforces card
 
 links:

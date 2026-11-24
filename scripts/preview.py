@@ -118,6 +118,9 @@ def render(handle: str, cfg: dict) -> str:
     body = re.sub(r'<p align="center"><img data-dark="https://raw\.githubusercontent\.com[^"]*/output/snake[^>]*></p>',
                   SNAKE_PLACEHOLDER, body)
     body = body.replace('="assets/', '="../assets/')
+    # The live view counter would count every local reload: show a stand-in.
+    body = re.sub(r'https://komarev\.com/ghpvc/\?[^"]*',
+                  "https://img.shields.io/badge/Profile%20views-counts%20after%20push-34d399?style=flat-square", body)
     body = re.sub(r"<(h[23])>(.*?)</\1>", lambda m: f'<{m.group(1)} id="{gh_slug(m.group(2))}">{m.group(2)}</{m.group(1)}>', body)
     body = body.replace('<p align="center">', '<p style="text-align:center">')
     return PAGE.format(handle=handle, name=cfg.get("name") or handle,

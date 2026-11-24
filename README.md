@@ -5,7 +5,15 @@
 <p align="center">
 <a href="#about-me"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/nav/about-dark.svg"><img src="assets/nav/about-light.svg" alt="About"></picture></a>&nbsp;
 <a href="#featured-projects"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/nav/projects-dark.svg"><img src="assets/nav/projects-light.svg" alt="Projects"></picture></a>&nbsp;
+<a href="#activity"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/nav/activity-dark.svg"><img src="assets/nav/activity-light.svg" alt="Activity"></picture></a>&nbsp;
 <a href="#live-stats"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/nav/stats-dark.svg"><img src="assets/nav/stats-light.svg" alt="Stats"></picture></a>
+</p>
+
+<p align="center">
+<img src="https://komarev.com/ghpvc/?username=arafatsheikh098&label=Profile%20views&color=34d399&style=flat-square" alt="Profile views">
+<a href="https://github.com/arafatsheikh098?tab=followers"><img src="https://img.shields.io/github/followers/arafatsheikh098?label=Followers&style=flat-square&color=fb3b5a" alt="Followers"></a>
+<a href="https://github.com/arafatsheikh098?tab=repositories"><img src="https://img.shields.io/github/stars/arafatsheikh098?affiliations=OWNER&label=Stars&style=flat-square&color=34d399" alt="Stars"></a>
+<a href="https://codeforces.com/profile/arafatsheikh098"><img src="https://img.shields.io/badge/Codeforces-arafatsheikh098-fb3b5a?style=flat-square" alt="Codeforces"></a>
 </p>
 
 ## About me
@@ -27,6 +35,8 @@ Most of my work is full-stack, using **Python/FastAPI** or **TypeScript/React**,
 
 ## Featured projects
 
+<p align="center"><sub>Real screenshots from each repo. They cycle every few seconds, and clicking a card opens the repo.</sub></p>
+
 <p align="center">
 <a href="https://github.com/arafatsheikh098/weave"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/weave-dark.svg"><img src="assets/projects/weave-light.svg" alt="weave" width="49%"></picture></a>
 <a href="https://github.com/arafatsheikh098/floodwatch-ctg"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/floodwatch-ctg-dark.svg"><img src="assets/projects/floodwatch-ctg-light.svg" alt="floodwatch-ctg" width="49%"></picture></a>
@@ -40,6 +50,20 @@ Most of my work is full-stack, using **Python/FastAPI** or **TypeScript/React**,
 <p align="center">
 <a href="https://github.com/arafatsheikh098/DocMind"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/docmind-dark.svg"><img src="assets/projects/docmind-light.svg" alt="DocMind" width="49%"></picture></a>
 <a href="https://github.com/arafatsheikh098/ArborVision"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/arborvision-dark.svg"><img src="assets/projects/arborvision-light.svg" alt="ArborVision" width="49%"></picture></a>
+</p>
+
+### More projects in pictures
+
+<p align="center">
+<a href="https://github.com/arafatsheikh098/LeafCheck"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/gallery/leafcheck-dark.svg"><img src="assets/gallery/leafcheck-light.svg" alt="LeafCheck" width="32%"></picture></a>
+<a href="https://github.com/arafatsheikh098/Stratum"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/gallery/stratum-dark.svg"><img src="assets/gallery/stratum-light.svg" alt="Stratum" width="32%"></picture></a>
+<a href="https://github.com/arafatsheikh098/SplitMate"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/gallery/splitmate-dark.svg"><img src="assets/gallery/splitmate-light.svg" alt="SplitMate" width="32%"></picture></a>
+</p>
+
+<p align="center">
+<a href="https://github.com/arafatsheikh098/ShopDesk"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/gallery/shopdesk-dark.svg"><img src="assets/gallery/shopdesk-light.svg" alt="ShopDesk" width="32%"></picture></a>
+<a href="https://github.com/arafatsheikh098/PocketLedger"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/gallery/pocketledger-dark.svg"><img src="assets/gallery/pocketledger-light.svg" alt="PocketLedger" width="32%"></picture></a>
+<a href="https://github.com/arafatsheikh098/floodwatch-ctg"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/gallery/floodwatch-ctg-dark.svg"><img src="assets/gallery/floodwatch-ctg-light.svg" alt="floodwatch-ctg" width="32%"></picture></a>
 </p>
 
 ## All projects
@@ -108,14 +132,23 @@ Most of my work is full-stack, using **Python/FastAPI** or **TypeScript/React**,
 
 <p align="center"><a href="https://skillicons.dev"><img src="https://skillicons.dev/icons?i=py,ts,js,c,cpp,react,nodejs,fastapi,django,postgres,redis,docker,linux,git,tailwind,pytorch&perline=8" alt="py, ts, js, c, cpp, react, nodejs, fastapi, django, postgres, redis, docker, linux, git, tailwind, pytorch"></a></p>
 
+## Activity
+
+<p align="center"><a href="https://github.com/arafatsheikh098"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/heatmap-dark.svg"><img src="assets/heatmap-light.svg" alt="Contribution heatmap" width="98%"></picture></a></p>
+
+<p align="center">
+<a href="https://github.com/arafatsheikh098?tab=overview"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/activity-dark.svg"><img src="assets/activity-light.svg" alt="Recent activity" width="49%"></picture></a>
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/rhythm-dark.svg"><img src="assets/rhythm-light.svg" alt="Coding rhythm by weekday" width="49%"></picture>
+</p>
+
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/arafatsheikh098/arafatsheikh098/output/snake-dark.svg"><img src="https://raw.githubusercontent.com/arafatsheikh098/arafatsheikh098/output/snake-light.svg" alt="Snake eating my contribution graph" width="100%"></picture></p>
+
 ## Live stats
 
 <p align="center">
 <a href="https://github.com/arafatsheikh098?tab=repositories"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/stats-dark.svg"><img src="assets/stats-light.svg" alt="GitHub stats" width="49%"></picture></a>
 <a href="https://codeforces.com/profile/arafatsheikh098"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/codeforces-dark.svg"><img src="assets/codeforces-light.svg" alt="Codeforces rating" width="49%"></picture></a>
 </p>
-
-<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/arafatsheikh098/arafatsheikh098/output/snake-dark.svg"><img src="https://raw.githubusercontent.com/arafatsheikh098/arafatsheikh098/output/snake-light.svg" alt="Snake eating my contribution graph" width="100%"></picture></p>
 
 <p align="center"><sub>
 ✨ Like this profile? It's a template. Open <a href="https://github.com/arafatsheikh098/arafatsheikh098"><b>arafatsheikh098/arafatsheikh098</b></a>, click <b>Use this template</b>, edit <code>profile.yml</code>, and the daily Action builds yours.
