@@ -18,6 +18,10 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # Optional, opt-in: classic token with the `user` scope. When set, the
+      # sidebar values from profile.yml are written to your GitHub profile.
+      PROFILE_TOKEN: ${{ secrets.PROFILE_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -33,6 +37,10 @@ jobs:
           # Optional: a token that can read your repos' traffic, for view counts.
           TRAFFIC_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
         run: python scripts/build.py --refresh
+
+      - name: Sync profile sidebar (only with PROFILE_TOKEN)
+        if: ${{ env.PROFILE_TOKEN != '' }}
+        run: python scripts/sync_profile.py
 
       - name: Commit if anything changed
         run: |
