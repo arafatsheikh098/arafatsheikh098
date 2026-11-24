@@ -466,7 +466,8 @@ def stats_card(stats: dict, langs: list[tuple[str, float]], p: dict) -> str:
     cells = [
         ("contributions", stats.get("contributions"), "in the last year"),
         ("current streak", stats.get("streak"), "days"),
-        ("public repos", stats.get("repos"), "and counting"),
+        ("repo views", stats.get("views"), f"since {stats['views_since'][5:].replace('-', '/')}" if stats.get("views_since") else "tracked daily")
+        if stats.get("views") is not None else ("public repos", stats.get("repos"), "and counting"),
         ("stars earned", stats.get("stars"), "across repos"),
     ]
     grid = ""
@@ -533,3 +534,348 @@ def pill(label: str, glyph: str, p: dict) -> str:
 {f'<text class="f" x="{gx}" y="{h / 2 + 5}" font-size="15" fill="{p["accent"]}">{esc(glyph)}</text>' if glyph else ''}
 <text class="f" x="{gx + (24 if glyph else 0)}" y="{h / 2 + 5}" font-size="{size}" font-weight="700" fill="{p['text']}">{esc(label)}</text>"""
     return _svg(w, h, body, label)
+
+
+# ── browser-window slideshow ────────────────────────────────────────────────
+
+OCTICON_EYE = (
+    "M8 2c1.981 0 3.671.992 4.933 2.078 1.27 1.091 2.187 2.345 2.637 3.023a1.62 1.62 0 0 1 0 1.798"
+    "c-.45.678-1.367 1.932-2.637 3.023C11.67 13.008 9.981 14 8 14c-1.981 0-3.671-.992-4.933-2.078"
+    "C1.797 10.83.88 9.576.43 8.898a1.62 1.62 0 0 1 0-1.798c.45-.677 1.367-1.931 2.637-3.022"
+    "C4.33 2.992 6.019 2 8 2ZM1.679 7.932a.12.12 0 0 0 0 .136c.411.622 1.241 1.75 2.366 2.717"
+    "C5.176 11.758 6.527 12.5 8 12.5c1.473 0 2.825-.742 3.955-1.715 1.124-.967 1.954-2.096 2.366-2.717"
+    "a.12.12 0 0 0 0-.136c-.412-.621-1.242-1.75-2.366-2.717C10.824 4.242 9.473 3.5 8 3.5"
+    "c-1.473 0-2.825.742-3.955 1.715-1.124.967-1.954 2.096-2.366 2.717ZM8 10a2 2 0 1 1-.001-3.999A2 2 0 0 1 8 10Z"
+)
+
+
+def _slides_css(n: int, per: float = 4.2) -> str:
+    if n <= 1:
+        return ""
+    period = per * n
+    slot = 100 / n
+    f = slot * 0.14
+    css = (
+        f".sl{{opacity:0;transform-box:fill-box;transform-origin:50% 0;animation:sl {period:.1f}s ease-in-out infinite}}"
+        f".s0{{opacity:1}}"
+        f"@keyframes sl{{0%{{opacity:0;transform:scale(1)}}{f:.2f}%{{opacity:1}}{slot:.2f}%{{opacity:1}}"
+        f"{min(slot + f, 100):.2f}%{{opacity:0;transform:scale(1.035)}}100%{{opacity:0}}}}"
+        f".dt{{opacity:.35;animation:dt {period:.1f}s linear infinite}}.t0{{opacity:1}}"
+        f"@keyframes dt{{0%,{slot:.2f}%{{opacity:1}}{slot + .01:.2f}%,100%{{opacity:.35}}}}"
+    )
+    css += "".join(f".s{i},.t{i}{{animation-delay:{i * per:.1f}s}}" for i in range(n))
+    return css
+
+
+def browser(x: float, y: float, w: float, h: float, url: str, images: list[str], p: dict,
+            bar: float = 28) -> str:
+    """Browser-window frame showing `images` (data URIs) as a crossfading slideshow."""
+    vy, vh = y + bar, h - bar
+    dark = p["mode"] == "dark"
+    chrome = "#1b222c" if dark else "#eef1f4"
+    url_bg = "#0f141b" if dark else "#ffffff"
+    dots = "".join(f'<circle cx="{x + 16 + i * 15}" cy="{y + bar / 2}" r="4.5" fill="{c}"/>'
+                   for i, c in enumerate(("#ff5f57", "#febc2e", "#28c840")))
+    uw = min(w - 90, text_width(url, 11, mono=True) + 34)
+    if text_width(url, 11, mono=True) + 34 > uw:
+        keep = int((uw - 40) / (11 * 0.61))
+        url = url[:keep - 1] + "…"
+    ux = x + (w - uw) / 2 + 20
+    lock = (f'<path transform="translate({ux + 9},{y + bar / 2 - 5}) scale(.62)" '
+            f'd="M4 4a4 4 0 0 1 8 0v2h.25c.966 0 1.75.784 1.75 1.75v5.5A1.75 1.75 0 0 1 12.25 15h-8.5A1.75 1.75 0 0 1 2 13.25v-5.5C2 6.784 2.784 6 3.75 6H4Zm8.25 3.5h-8.5a.25.25 0 0 0-.25.25v5.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-5.5a.25.25 0 0 0-.25-.25ZM10.5 6V4a2.5 2.5 0 1 0-5 0v2Z" '
+            f'fill="{p["faint"]}"/>')
+    imgs = "".join(
+        f'<image class="sl s{i}" href="{src}" x="{x}" y="{vy}" width="{w}" height="{vh}" preserveAspectRatio="xMidYMin slice"/>'
+        for i, src in enumerate(images))
+    if len(images) == 1:
+        imgs = imgs.replace('class="sl s0" ', "")
+    ind = ""
+    if len(images) > 1:
+        cx0 = x + w / 2 - (len(images) - 1) * 8
+        ind = (f'<rect x="{cx0 - 12}" y="{vy + vh - 22}" width="{(len(images) - 1) * 16 + 24}" height="14" rx="7" fill="#000" opacity=".45"/>'
+               + "".join(f'<circle class="dt t{i}" cx="{cx0 + i * 16}" cy="{vy + vh - 15}" r="3.2" fill="#fff"/>'
+                         for i in range(len(images))))
+    return (
+        f'<clipPath id="vp"><path d="M{x} {vy} h{w} v{vh - 10} a10 10 0 0 1 -10 10 h{-(w - 20)} a10 10 0 0 1 -10 -10 Z"/></clipPath>'
+        f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="10" fill="{chrome}"/>'
+        f'{dots}'
+        f'<rect x="{ux}" y="{y + 6}" width="{uw}" height="{bar - 12}" rx="{(bar - 12) / 2}" fill="{url_bg}"/>{lock}'
+        f'<text class="m" x="{ux + 22}" y="{y + bar / 2 + 3.8}" font-size="11" fill="{p["muted"]}">{esc(url)}</text>'
+        f'<g clip-path="url(#vp)"><rect x="{x}" y="{vy}" width="{w}" height="{vh}" fill="{p["bg"]}"/>{imgs}</g>'
+        f'{ind}'
+        f'<rect x="{x + .5}" y="{y + .5}" width="{w - 1}" height="{h - 1}" rx="10" fill="none" stroke="{p["border"]}"/>'
+    )
+
+
+def showcase_card(repo: dict, item: dict, images: list[str], p: dict, handle: str,
+                  idx: int = 0, views: int | None = None) -> str:
+    """Project card with a live screenshot slideshow on top."""
+    W, H = 480, 440
+    FX, FY, FW, FH = 14, 14, 452, 272
+    lang = repo.get("language") or ""
+    lc = LANG_COLORS.get(lang, p["faint"])
+    title = item.get("title") or repo["name"]
+    desc = strip_stack(repo.get("description") or "")
+    tag = (item.get("tag") or "").upper()
+
+    css = BASE_CSS + _slides_css(len(images)) + (
+        ".in{animation:in .7s ease-out backwards}"
+        "@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}"
+    )
+
+    tag_svg, tag_w = "", 0.0
+    if tag:
+        tag_w = text_width(tag, 10, bold=True) + len(tag) * 1.0 + 18
+        tx = W - 22 - tag_w
+        tag_svg = (
+            f'<rect x="{tx:.1f}" y="{FY + FH + 16}" width="{tag_w:.1f}" height="22" rx="11" fill="none" stroke="{p["accent2"]}" stroke-opacity=".55"/>'
+            f'<text class="f" x="{tx + tag_w / 2:.1f}" y="{FY + FH + 31}" text-anchor="middle" font-size="10" '
+            f'font-weight="700" letter-spacing="1" fill="{p["accent2"]}">{esc(tag)}</text>')
+    ty = FY + FH + 33
+    title = truncate(title, 19, W - 70 - tag_w - 30, bold=True)
+    lines = wrap(desc, 13, W - 48, 2) if desc else []
+    desc_svg = "".join(f'<text class="f" x="24" y="{ty + 24 + i * 19}" font-size="13" fill="{p["muted"]}">{esc(l)}</text>'
+                       for i, l in enumerate(lines))
+    cy = ty + 24 + 2 * 19 - 4
+    chips, x = "", 24.0
+    for s in item.get("stack") or []:
+        w = text_width(s, 11.5) + 22
+        if x + w > W - 24:
+            break
+        c, w = chip(x, cy, s, p, size=11.5, h=23)
+        chips += c
+        x += w + 7
+
+    fy = H - 18
+    foot = ""
+    fx = 24.0
+    if lang:
+        foot += (f'<circle cx="{fx + 6}" cy="{fy - 4.5}" r="5.5" fill="{lc}"/>'
+                 f'<text class="f" x="{fx + 18}" y="{fy}" font-size="12.5" fill="{p["muted"]}">{esc(lang)}</text>')
+        fx += 18 + text_width(lang, 12.5) + 16
+    foot += (f'<path transform="translate({fx:.1f},{fy - 12.5})" d="{OCTICON_STAR}" fill="{p["muted"]}"/>'
+             f'<text class="f" x="{fx + 22:.1f}" y="{fy}" font-size="12.5" fill="{p["muted"]}">{repo.get("stargazers_count", 0)}</text>')
+    fx += 22 + text_width(str(repo.get("stargazers_count", 0)), 12.5) + 16
+    if views is not None:
+        foot += (f'<path transform="translate({fx:.1f},{fy - 12.5})" d="{OCTICON_EYE}" fill="{p["muted"]}"/>'
+                 f'<text class="f" x="{fx + 22:.1f}" y="{fy}" font-size="12.5" fill="{p["muted"]}">{views:,} views</text>')
+    foot += (f'<text class="f" x="{W - 24}" y="{fy}" text-anchor="end" font-size="12.5" '
+             f'font-weight="600" fill="{p["accent"]}">Open repo →</text>')
+
+    body = f"""<defs>
+<clipPath id="c"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="16"/></clipPath>
+<radialGradient id="g" cx="1" cy="1" r="1"><stop offset="0" stop-color="{lc}" stop-opacity="{'.18' if p['mode'] == 'dark' else '.10'}"/><stop offset=".6" stop-color="{lc}" stop-opacity="0"/></radialGradient>
+<linearGradient id="top" x1="0" x2="1"><stop offset="0" stop-color="{p['accent']}"/><stop offset="1" stop-color="{p['accent2']}"/></linearGradient>
+</defs>
+<style>{css}</style>
+<g clip-path="url(#c)"><rect width="{W}" height="{H}" fill="{p['card']}"/><rect width="{W}" height="{H}" fill="url(#g)"/><rect width="{W}" height="3" fill="url(#top)"/></g>
+<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="16" fill="none" stroke="{p['border']}"/>
+{browser(FX, FY, FW, FH, f"github.com/{handle}/{repo['name']}", images, p)}
+<g class="in">
+<text class="f" x="24" y="{ty}" font-size="19" font-weight="700" fill="{p['text']}">{esc(title)}</text>
+{tag_svg}
+{desc_svg}
+{chips}
+{foot}
+</g>"""
+    return _svg(W, H, body, f"{title}: {desc}")
+
+
+def gallery_card(repo: dict, images: list[str], p: dict, handle: str, caption: str = "") -> str:
+    """Compact browser-window thumbnail for the 'in pictures' strip."""
+    W, H = 320, 236
+    lang = repo.get("language") or ""
+    css = BASE_CSS + _slides_css(len(images), per=3.6)
+    name = truncate(repo["name"], 14, W - 60, bold=True)
+    cap = truncate(caption or strip_stack(repo.get("description") or ""), 11.5, W - 28)
+    body = f"""<style>{css}</style>
+<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="14" fill="{p['card']}" stroke="{p['border']}"/>
+{browser(10, 10, W - 20, 170, f"{handle}/{repo['name']}", images, p, bar=22)}
+<circle cx="20" cy="201" r="5" fill="{LANG_COLORS.get(lang, p['faint'])}"/>
+<text class="f" x="32" y="206" font-size="14" font-weight="700" fill="{p['text']}">{esc(name)}</text>
+<text class="f" x="{W - 14}" y="206" text-anchor="end" font-size="12" font-weight="600" fill="{p['accent']}">→</text>
+<text class="f" x="14" y="225" font-size="11.5" fill="{p['muted']}">{esc(cap)}</text>"""
+    return _svg(W, H, body, f"{repo['name']} screenshots")
+
+
+# ── activity: heatmap, timeline, weekly rhythm ──────────────────────────────
+
+def _level_colors(p: dict) -> list[tuple[str, float]]:
+    empty = "#1c2430" if p["mode"] == "dark" else "#ebeff2"
+    return [(empty, 1), (p["accent"], .28), (p["accent"], .5), (p["accent"], .75), (p["accent"], 1)]
+
+
+def heatmap_card(contrib: dict, p: dict) -> str:
+    import datetime as _dt
+    W, H = 1000, 246
+    days = contrib.get("days") or {}
+    if not days:
+        return _svg(W, 60, f'<text class="f" x="20" y="36" fill="{p["muted"]}">No contribution data</text>', "Contributions")
+    dates = sorted(days)
+    first = _dt.date.fromisoformat(dates[0])
+    start = first - _dt.timedelta(days=(first.weekday() + 1) % 7)  # back to Sunday
+    step, cell, X0, Y0 = 17.5, 14, 52, 84
+    lv = _level_colors(p)
+
+    cells, months, last_month = [], [], None
+    cols = 0
+    for ds in dates:
+        d = _dt.date.fromisoformat(ds)
+        col = (d - start).days // 7
+        row = (d.weekday() + 1) % 7
+        cols = max(cols, col + 1)
+        info = days[ds]
+        c, a = lv[min(info["level"], 4)]
+        cells.append(f'<rect class="q c{col}" x="{X0 + col * step:.1f}" y="{Y0 + row * step:.1f}" width="{cell}" height="{cell}" rx="3.5" '
+                     f'fill="{c}" fill-opacity="{a}"><title>{info["count"]} on {ds}</title></rect>')
+        if row == 0 or ds == dates[0]:
+            if d.month != last_month and d.day <= 7 or last_month is None:
+                months.append(f'<text class="f" x="{X0 + col * step:.1f}" y="{Y0 - 10}" font-size="11.5" fill="{p["muted"]}">{d.strftime("%b")}</text>')
+            last_month = d.month
+    css = BASE_CSS + (
+        ".q{transform-box:fill-box;transform-origin:center;animation:pop .5s cubic-bezier(.2,.9,.3,1.4) backwards}"
+        "@keyframes pop{from{opacity:0;transform:scale(.3)}}"
+        + "".join(f".c{i}{{animation-delay:{.2 + i * .028:.3f}s}}" for i in range(cols))
+    )
+    wd = "".join(f'<text class="f" x="{X0 - 10}" y="{Y0 + r * step + 11}" text-anchor="end" font-size="11" fill="{p["faint"]}">{n}</text>'
+                 for r, n in ((1, "Mon"), (3, "Wed"), (5, "Fri")))
+
+    counts = {k: v["count"] for k, v in days.items()}
+    best_day, best = max(counts.items(), key=lambda kv: kv[1])
+    active = sum(1 for v in counts.values() if v)
+    total = contrib.get("total") or sum(counts.values())
+    stats = [("current streak", f'{contrib.get("streak", 0)}d'), ("longest streak", f'{contrib.get("longest", 0)}d'),
+             ("active days", f"{active}"),
+             ("best day", f'{best} · {_dt.date.fromisoformat(best_day).strftime("%d %b")}')]
+    sx, chips = W - 24, ""
+    for label, val in reversed(stats):
+        w = max(text_width(val, 17, bold=True), text_width(label, 11)) + 4
+        sx -= w
+        chips += (f'<text class="f" x="{sx:.1f}" y="40" font-size="17" font-weight="800" fill="{p["text"]}">{esc(val)}</text>'
+                  f'<text class="f" x="{sx:.1f}" y="56" font-size="11" fill="{p["muted"]}">{esc(label)}</text>')
+        sx -= 26
+
+    legend_x = X0 + cols * step - 5 * step - 70
+    legend = (f'<text class="f" x="{legend_x:.1f}" y="{H - 16}" font-size="11" fill="{p["faint"]}">Less</text>'
+              + "".join(f'<rect x="{legend_x + 32 + i * step:.1f}" y="{H - 27}" width="{cell}" height="{cell}" rx="3.5" fill="{c}" fill-opacity="{a}"/>'
+                        for i, (c, a) in enumerate(lv))
+              + f'<text class="f" x="{legend_x + 38 + 5 * step:.1f}" y="{H - 16}" font-size="11" fill="{p["faint"]}">More</text>')
+
+    body = f"""<defs><linearGradient id="top" x1="0" x2="1"><stop offset="0" stop-color="{p['accent']}"/><stop offset="1" stop-color="{p['accent2']}"/></linearGradient>
+<clipPath id="c"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="16"/></clipPath></defs>
+<style>{css}</style>
+<g clip-path="url(#c)"><rect width="{W}" height="{H}" fill="{p['card']}"/><rect width="{W}" height="3" fill="url(#top)"/></g>
+<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="16" fill="none" stroke="{p['border']}"/>
+<text class="f" x="24" y="30" font-size="11" font-weight="700" letter-spacing="1.6" fill="{p['faint']}">CONTRIBUTIONS</text>
+<text class="f" x="24" y="56" font-size="22" font-weight="800" fill="{p['text']}">{total:,}<tspan font-size="14" font-weight="500" fill="{p['muted']}"> in the last year</tspan></text>
+{chips}
+{''.join(months)}{wd}
+{''.join(cells)}
+{legend}"""
+    return _svg(W, H, body, f"{total} contributions in the last year")
+
+
+ACT = {  # kind → (glyph, colour key)
+    "push": ("↑", "accent"), "create": ("+", "accent2"), "public": ("◎", "accent2"),
+    "release": ("◆", "accent2"), "tag": ("◆", "accent2"), "merged": ("⤵", "accent"),
+    "pr": ("⇄", "accent"), "issue": ("!", "accent2"), "star": ("★", "faint"),
+}
+
+
+def _act_text(e: dict) -> tuple[str, str]:
+    k, r = e["kind"], e["repo"]
+    if k == "push":
+        return f"Pushed {e['n']} commit{'s' if e['n'] != 1 else ''} to", r
+    return {
+        "create": ("Created repository", r), "public": ("Open-sourced", r),
+        "release": (f"Released {e.get('ref') or ''} of".replace("  ", " "), r),
+        "tag": (f"Tagged {e.get('ref') or ''} in", r),
+        "merged": (f"Merged PR #{e.get('num')} in", r), "pr": (f"Opened PR #{e.get('num')} in", r),
+        "issue": (f"Opened issue #{e.get('num')} in", r), "star": ("Starred", r),
+    }[k]
+
+
+def activity_card(events: list[dict], p: dict, rows: int = 7) -> str:
+    import datetime as _dt
+    W, H = 480, 330
+    css = BASE_CSS + (".in{animation:in .6s ease-out backwards}"
+                      "@keyframes in{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}")
+    items = [e for e in events if e["kind"] != "star"][:rows] or events[:rows]
+    body_rows = ""
+    y0, gap = 78, 35
+    if items:
+        body_rows += f'<line x1="37" y1="{y0}" x2="37" y2="{y0 + (len(items) - 1) * gap}" stroke="{p["border"]}" stroke-width="2"/>'
+    for i, e in enumerate(items):
+        y = y0 + i * gap
+        glyph, ck = ACT.get(e["kind"], ("•", "accent"))
+        col = p[ck]
+        verb, repo = _act_text(e)
+        day = _dt.date.fromisoformat(e["day"]).strftime("%d %b")
+        repo_t = truncate(repo, 13, W - 140 - text_width(verb + " ", 13), bold=True)
+        body_rows += (
+            f'<g class="in" style="animation-delay:{.15 + i * .09:.2f}s">'
+            f'<circle cx="37" cy="{y}" r="11" fill="{p["card"]}" stroke="{col}" stroke-width="1.6"/>'
+            f'<text class="f" x="37" y="{y + 4.2}" text-anchor="middle" font-size="11.5" font-weight="700" fill="{col}">{esc(glyph)}</text>'
+            f'<text class="f" x="58" y="{y + 4.5}" font-size="13" fill="{p["muted"]}">{esc(verb)} '
+            f'<tspan font-weight="700" fill="{p["text"]}">{esc(repo_t)}</tspan></text>'
+            f'<text class="f" x="{W - 24}" y="{y + 4.5}" text-anchor="end" font-size="11.5" fill="{p["faint"]}">{day}</text></g>')
+    if not items:
+        body_rows = f'<text class="f" x="24" y="90" font-size="13" fill="{p["faint"]}">No public activity in the last 90 days.</text>'
+    body = f"""<defs><linearGradient id="top" x1="0" x2="1"><stop offset="0" stop-color="{p['accent']}"/><stop offset="1" stop-color="{p['accent2']}"/></linearGradient>
+<clipPath id="c"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="16"/></clipPath></defs>
+<style>{css}</style>
+<g clip-path="url(#c)"><rect width="{W}" height="{H}" fill="{p['card']}"/><rect width="{W}" height="3" fill="url(#top)"/></g>
+<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="16" fill="none" stroke="{p['border']}"/>
+<text class="f" x="24" y="34" font-size="11" font-weight="700" letter-spacing="1.6" fill="{p['faint']}">RECENT ACTIVITY</text>
+<text class="f" x="{W - 24}" y="34" text-anchor="end" font-size="11.5" fill="{p['muted']}">public events · last 90 days</text>
+{body_rows}"""
+    return _svg(W, H, body, "Recent GitHub activity")
+
+
+def rhythm_card(contrib: dict, p: dict) -> str:
+    import datetime as _dt
+    W, H = 480, 330
+    days = contrib.get("days") or {}
+    names = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    per = [0] * 7
+    for ds, v in days.items():
+        per[_dt.date.fromisoformat(ds).weekday()] += v["count"]
+    top = max(per) or 1
+    best = per.index(top)
+    counts = [v["count"] for v in days.values()]
+    active = [c for c in counts if c]
+    avg = sum(active) / len(active) if active else 0
+    recent = sorted(days)[-30:]
+    last30 = sum(days[d]["count"] for d in recent)
+
+    css = BASE_CSS + (
+        ".b{transform-box:fill-box;transform-origin:bottom;animation:grow 1s cubic-bezier(.2,.8,.2,1) backwards}"
+        "@keyframes grow{from{transform:scaleY(0)}}"
+        + "".join(f".b{i}{{animation-delay:{.2 + i * .08:.2f}s}}" for i in range(7))
+    )
+    bx, by, bh, bw, gap = 30, 244, 150, 40, 23.5
+    bars = ""
+    for i, v in enumerate(per):
+        h = max(4, bh * v / top)
+        x = bx + i * (bw + gap)
+        col = p["accent2"] if i == best else p["accent"]
+        op = 1 if i == best else .7
+        bars += (f'<rect class="b b{i}" x="{x:.1f}" y="{by - h:.1f}" width="{bw}" height="{h:.1f}" rx="6" fill="{col}" fill-opacity="{op}"/>'
+                 f'<text class="f" x="{x + bw / 2:.1f}" y="{by - h - 7:.1f}" text-anchor="middle" font-size="11.5" font-weight="600" fill="{p["text"]}">{v}</text>'
+                 f'<text class="f" x="{x + bw / 2:.1f}" y="{by + 18}" text-anchor="middle" font-size="11.5" fill="{p["muted"] if i != best else col}">{names[i]}</text>')
+    full = ["Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays", "Sundays"][best]
+    foot = (f'<text class="f" x="24" y="{H - 34}" font-size="13" fill="{p["muted"]}">Most active on '
+            f'<tspan font-weight="700" fill="{p["accent2"]}">{full}</tspan></text>'
+            f'<text class="f" x="24" y="{H - 15}" font-size="12" fill="{p["faint"]}">{last30} contributions in the last 30 days · '
+            f'{avg:.1f} per active day</text>')
+    body = f"""<defs><linearGradient id="top" x1="0" x2="1"><stop offset="0" stop-color="{p['accent']}"/><stop offset="1" stop-color="{p['accent2']}"/></linearGradient>
+<clipPath id="c"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="16"/></clipPath></defs>
+<style>{css}</style>
+<g clip-path="url(#c)"><rect width="{W}" height="{H}" fill="{p['card']}"/><rect width="{W}" height="3" fill="url(#top)"/></g>
+<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="16" fill="none" stroke="{p['border']}"/>
+<text class="f" x="24" y="34" font-size="11" font-weight="700" letter-spacing="1.6" fill="{p['faint']}">CODING RHYTHM</text>
+<text class="f" x="{W - 24}" y="34" text-anchor="end" font-size="11.5" fill="{p['muted']}">contributions by weekday · last year</text>
+<line x1="24" y1="{by}" x2="{W - 24}" y2="{by}" stroke="{p['border']}"/>
+{bars}
+{foot}"""
+    return _svg(W, H, body, "Contributions by weekday")
