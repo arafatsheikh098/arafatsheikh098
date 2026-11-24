@@ -65,6 +65,23 @@ main{{flex:1;min-width:0}}
 .md details{{margin:0 0 12px}}
 .md summary{{cursor:pointer}}
 .snake-ph{{border:1px dashed var(--border);border-radius:8px;padding:28px;text-align:center;color:var(--muted)}}
+.av{{position:relative;width:296px}}
+.st{{position:absolute;left:236px;top:238px;height:38px;min-width:38px;max-width:38px;overflow:hidden;white-space:nowrap;
+  display:flex;align-items:center;gap:8px;padding:0 9px;border:1px solid var(--border);border-radius:19px;background:var(--bg);
+  font-size:13px;color:var(--fg);transition:max-width .35s ease,left .35s ease;cursor:default;box-shadow:0 1px 3px #0003}}
+.st:hover,.st.open{{max-width:330px;left:236px}}
+.st .e{{font-size:16px;flex:none}}
+aside .bio{{font-size:16px;margin:12px 0 0;line-height:1.5}}
+aside .ff{{margin:12px 0 16px;color:var(--muted)}} aside .ff svg{{vertical-align:text-bottom;fill:var(--muted)}} aside .ff b{{color:var(--fg)}}
+aside ul{{list-style:none;padding:0;margin:0 0 16px}}
+aside li{{display:flex;gap:8px;align-items:center;margin:4px 0;font-size:14px}}
+aside li svg{{flex:none;fill:var(--muted)}}
+aside h2{{font-size:16px;margin:16px 0 8px;padding-top:16px;border-top:1px solid var(--border)}}
+.ach{{display:flex;gap:8px;flex-wrap:wrap}}
+.ach span{{width:64px;height:64px;border-radius:50%;border:2px dashed var(--border);display:grid;place-items:center;font-size:28px;filter:grayscale(1);opacity:.55}}
+.tip{{font-size:12px;color:var(--muted);margin-top:6px}}
+.pro{{display:inline-block;border:1px solid #8957e5;color:#ab7df8;border-radius:2em;padding:0 7px;font-size:12px;font-weight:500}}
+.note{{margin-top:20px;padding:10px 12px;border:1px dashed var(--border);border-radius:6px;font-size:12px;color:var(--muted)}}
 @media (max-width:900px){{.wrap{{flex-direction:column}}aside{{width:auto}}aside img{{width:120px;height:120px}}}}
 </style>
 </head>
@@ -72,12 +89,7 @@ main{{flex:1;min-width:0}}
 <div class="bar"><b>Local preview</b> of github.com/{handle} · not pushed
 <span class="sp"></span><button id="t">Switch to light</button></div>
 <div class="wrap">
-<aside>
-<img src="https://github.com/{handle}.png?size=460" alt="">
-<h1>{name}</h1><div class="h">{handle}</div>
-<a class="btn" href="https://github.com/{handle}">Open real profile</a>
-<div class="f">{location}</div>
-</aside>
+{aside}
 <main><div class="box"><div class="crumb">{handle} / README.md</div><div class="md">
 {body}
 </div></div></main>
@@ -88,6 +100,10 @@ const imgs=[...document.querySelectorAll('img[data-dark]')];
 function apply(m){{root.dataset.theme=m;imgs.forEach(i=>i.src=i.dataset[m]);
   btn.textContent='Switch to '+(m==='dark'?'light':'dark');localStorage.theme=m}}
 btn.onclick=()=>apply(root.dataset.theme==='dark'?'light':'dark');
+const lt=document.getElementById('lt');
+if(lt){{const [hh,mm]=lt.dataset.tz.replace('+','').split(':').map(Number),sign=lt.dataset.tz[0]==='-'?-1:1;
+  const tick=()=>{{const d=new Date(Date.now()+sign*(hh*60+mm)*60000);
+    lt.textContent=d.toISOString().slice(11,16)+' (UTC '+lt.dataset.tz+')';}};tick();setInterval(tick,30000);}}
 apply(new URLSearchParams(location.search).get('theme')||localStorage.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'));
 </script>
 </body>
@@ -123,8 +139,64 @@ def render(handle: str, cfg: dict) -> str:
                   "https://img.shields.io/badge/Profile%20views-counts%20after%20push-34d399?style=flat-square", body)
     body = re.sub(r"<(h[23])>(.*?)</\1>", lambda m: f'<{m.group(1)} id="{gh_slug(m.group(2))}">{m.group(2)}</{m.group(1)}>', body)
     body = body.replace('<p align="center">', '<p style="text-align:center">')
-    return PAGE.format(handle=handle, name=cfg.get("name") or handle,
-                       location=cfg.get("location") or "", body=body)
+    return PAGE.format(handle=handle, body=body, aside=aside(handle, cfg))
+
+
+ICONS = {
+    "org": "M1.75 16A1.75 1.75 0 0 1 0 14.25V1.75C0 .784.784 0 1.75 0h8.5C11.216 0 12 .784 12 1.75v12.5c0 .085-.006.168-.018.25h2.268a.25.25 0 0 0 .25-.25V8.285a.25.25 0 0 0-.111-.208l-1.055-.703a.749.749 0 1 1 .832-1.248l1.055.703c.487.325.779.871.779 1.456v5.965A1.75 1.75 0 0 1 14.25 16h-3.5a.766.766 0 0 1-.197-.026c-.099.017-.2.026-.303.026h-3a.75.75 0 0 1-.75-.75V14h-1v1.25a.75.75 0 0 1-.75.75Zm-.25-1.75c0 .138.112.25.25.25H4v-1.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 .75.75v1.25h2.25a.25.25 0 0 0 .25-.25V1.75a.25.25 0 0 0-.25-.25h-8.5a.25.25 0 0 0-.25.25ZM3.75 6h.5a.75.75 0 0 1 0 1.5h-.5a.75.75 0 0 1 0-1.5ZM3 3.75A.75.75 0 0 1 3.75 3h.5a.75.75 0 0 1 0 1.5h-.5A.75.75 0 0 1 3 3.75Zm4 3A.75.75 0 0 1 7.75 6h.5a.75.75 0 0 1 0 1.5h-.5A.75.75 0 0 1 7 6.75ZM7.75 3h.5a.75.75 0 0 1 0 1.5h-.5a.75.75 0 0 1 0-1.5ZM3 9.75A.75.75 0 0 1 3.75 9h.5a.75.75 0 0 1 0 1.5h-.5A.75.75 0 0 1 3 9.75ZM7.75 9h.5a.75.75 0 0 1 0 1.5h-.5a.75.75 0 0 1 0-1.5Z",
+    "loc": "m12.596 11.596-3.535 3.536a1.5 1.5 0 0 1-2.122 0l-3.535-3.536a6.5 6.5 0 1 1 9.192-9.193 6.5 6.5 0 0 1 0 9.193Zm-1.06-8.132v-.001a5 5 0 1 0-7.072 7.072L8 14.07l3.536-3.534a5 5 0 0 0 0-7.072ZM8 9a2 2 0 1 1-.001-3.999A2 2 0 0 1 8 9Z",
+    "clock": "M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Zm7-3.25v2.992l2.028.812a.75.75 0 0 1-.557 1.392l-2.5-1A.751.751 0 0 1 7 8.25v-3.5a.75.75 0 0 1 1.5 0Z",
+    "link": "m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z",
+    "people": "M2 5.5a3.5 3.5 0 1 1 5.898 2.549 5.508 5.508 0 0 1 3.034 4.084.75.75 0 1 1-1.482.235 4 4 0 0 0-7.9 0 .75.75 0 0 1-1.482-.236A5.507 5.507 0 0 1 3.102 8.05 3.493 3.493 0 0 1 2 5.5ZM11 4a3.001 3.001 0 0 1 2.22 5.018 5.01 5.01 0 0 1 2.56 3.012.749.749 0 0 1-.885.954.752.752 0 0 1-.549-.514 3.507 3.507 0 0 0-2.522-2.372.75.75 0 0 1-.574-.73v-.352a.75.75 0 0 1 .416-.672A1.5 1.5 0 0 0 11 5.5.75.75 0 0 1 11 4Zm-5.5-.5a2 2 0 1 0-.001 3.999A2 2 0 0 0 5.5 3.5Z",
+}
+
+
+def icon(name: str) -> str:
+    return f'<svg width="16" height="16" viewBox="0 0 16 16"><path d="{ICONS[name]}"/></svg>'
+
+
+def aside(handle: str, cfg: dict) -> str:
+    """The left column, showing the `sidebar:` values as GitHub would."""
+    import html as h
+    import json
+    e = h.escape
+    path = ROOT / ".cache" / "sidebar.json"
+    sb = json.loads(path.read_text()) if path.exists() else {}
+    name = cfg.get("name") or handle
+    out = [f'<aside><div class="av"><img src="https://github.com/{handle}.png?size=460" alt="">']
+    if sb.get("status_text"):
+        out.append(f'<div class="st open" title="Status"><span class="e">{e(sb.get("status_emoji") or "💭")}</span>{e(sb["status_text"])}</div>')
+    out.append(f'</div><h1>{e(name)}</h1><div class="h">{e(handle)}</div>')
+    if sb.get("bio"):
+        out.append(f'<div class="bio">{e(sb["bio"])}</div>')
+    out.append(f'<a class="btn" href="https://github.com/settings/profile">Edit profile</a>')
+    if sb.get("followers") is not None:
+        out.append(f'<div class="ff">{icon("people")} <b>{sb["followers"]}</b> followers · <b>{sb["following"]}</b> following</div>')
+    items = []
+    if sb.get("company"):
+        items.append(("org", e(sb["company"])))
+    if sb.get("location"):
+        items.append(("loc", e(sb["location"])))
+    if sb.get("timezone"):
+        items.append(("clock", f'<span id="lt" data-tz="{e(sb["timezone"])}"></span>'))
+    if sb.get("website"):
+        items.append(("link", f'<a href="{e(sb["website"])}">{e(sb["website"].split("//")[-1])}</a>'))
+    for u in sb.get("socials") or []:
+        items.append(("link", f'<a href="{e(u)}">{e(u.split("//")[-1])}</a>'))
+    out.append("<ul>" + "".join(f"<li>{icon(i)}{t}</li>" for i, t in items) + "</ul>")
+    out.append('<h2>Achievements</h2><div class="ach">'
+               '<span title="Pull Shark: get 2 pull requests merged">🦈</span>'
+               '<span title="Quickdraw: close an issue or PR within 5 minutes of opening">⚡</span>'
+               '<span title="Pair Extraordinaire: co-author a merged commit with a classmate">👯</span>'
+               '<span title="Starstruck: a repo with 16 stars">🌟</span></div>'
+               '<div class="tip">Not earned yet. Hover a badge to see how to unlock it.</div>')
+    out.append('<h2>Organizations</h2><div class="ach"><span title="Create or join an org (e.g. your CSE club or hackathon team) and make membership public">🏛️</span></div>'
+               '<div class="tip">Join or create one (CSE club, hackathon team) and set membership to public.</div>')
+    out.append('<h2>Highlights</h2><div><span class="pro">PRO</span></div>')
+    out.append('<div class="note"><b>Preview of your sidebar.</b> These values come from <code>sidebar:</code> in profile.yml. '
+               'Set them in GitHub → Settings → Public profile, or add a <code>PROFILE_TOKEN</code> secret and the daily '
+               'Action keeps the bio and status updated with live numbers.</div></aside>')
+    return "".join(out)
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
