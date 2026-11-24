@@ -69,7 +69,7 @@ main{{flex:1;min-width:0}}
 .st{{position:absolute;left:236px;top:238px;height:38px;min-width:38px;max-width:38px;overflow:hidden;white-space:nowrap;
   display:flex;align-items:center;gap:8px;padding:0 9px;border:1px solid var(--border);border-radius:19px;background:var(--bg);
   font-size:13px;color:var(--fg);transition:max-width .35s ease,left .35s ease;cursor:default;box-shadow:0 1px 3px #0003}}
-.st:hover,.st.open{{max-width:330px;left:236px}}
+.st:hover,.st.open{{max-width:560px;left:236px;z-index:2}}
 .st .e{{font-size:16px;flex:none}}
 aside .bio{{font-size:16px;margin:12px 0 0;line-height:1.5}}
 aside .ff{{margin:12px 0 16px;color:var(--muted)}} aside .ff svg{{vertical-align:text-bottom;fill:var(--muted)}} aside .ff b{{color:var(--fg)}}
