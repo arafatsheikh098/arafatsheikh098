@@ -1,0 +1,7 @@
+# local build cache and preview output
+.cache/
+preview/
+__pycache__/
+*.pyc
+.DS_Store
+.venv/
