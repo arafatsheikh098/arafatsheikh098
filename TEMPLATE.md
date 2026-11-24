@@ -5,7 +5,7 @@ This profile page is generated. Every card is a hand-drawn SVG built from **one 
 ## 3 steps
 
 1. **Create your copy.** Click **Use this template → Create a new repository** and name it **exactly your GitHub username** (e.g. `octocat/octocat`), set to Public. GitHub shows that repo's README on your profile.
-2. **Edit `profile.yml`.** Change `handle`, `name`, taglines, featured repos and links. Anything you leave empty (`""` or `[]`) is hidden.
+2. **Edit `profile.yml`.** Change `handle`, `name`, taglines, featured repos and links. Anything you leave empty (`""` or `[]`) is hidden. Replace `assets/avatar.jpg` with your own photo, or delete it and clear `sidebar.avatar`.
 3. **Run the Action.** Go to **Actions → Build profile → Run workflow**, then **Snake → Run workflow**. A minute later your profile is live, and from then on it rebuilds daily.
 
 > If the Actions tab asks you to enable workflows, enable them. If the build can't push, open **Settings → Actions → General → Workflow permissions** and choose **Read and write**.
