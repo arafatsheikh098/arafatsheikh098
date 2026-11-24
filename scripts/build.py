@@ -1,0 +1,241 @@
+#!/usr/bin/env python3
+"""Build README.md and assets/*.svg from profile.yml plus live data.
+
+    python scripts/build.py            # fetch (cached 6h) and build
+    python scripts/build.py --refresh  # ignore the cache
+    python scripts/build.py --offline  # cache only, no network
+"""
+
+from __future__ import annotations
+
+import argparse
+import datetime as dt
+import os
+import re
+import sys
+from pathlib import Path
+
+import yaml
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import sources  # noqa: E402
+import svg  # noqa: E402
+
+ROOT = Path(__file__).resolve().parent.parent
+ASSETS = ROOT / "assets"
+MODES = ("dark", "light")
+
+NAV = [("About", "◆", "about-me"), ("Projects", "▣", "featured-projects"),
+       ("Stats", "▲", "live-stats"), ("Contact", "✦", "get-in-touch")]
+
+
+def write(path: Path, text: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if not path.exists() or path.read_text() != text:
+        path.write_text(text)
+
+
+def slug(s: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
+
+
+def picture(base: str, alt: str, width: str | None = None) -> str:
+    """<picture> that swaps dark/light SVGs to match the viewer's theme."""
+    w = f' width="{width}"' if width else ""
+    return (f'<picture><source media="(prefers-color-scheme: dark)" srcset="{base}-dark.svg">'
+            f'<img src="{base}-light.svg" alt="{svg.esc(alt)}"{w}></picture>')
+
+
+def render_template(tmpl: str, values: dict[str, str]) -> str:
+    def section(m):
+        return m.group(2) if values.get(m.group(1), "").strip() else ""
+    out = re.sub(r"\{\{#(\w+)\}\}(.*?)\{\{/\1\}\}", section, tmpl, flags=re.S)
+    out = re.sub(r"\{\{(\w+)\}\}", lambda m: values.get(m.group(1), ""), out)
+    return re.sub(r"\n{3,}", "\n\n", out).strip() + "\n"
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--offline", action="store_true", help="use cached data only")
+    ap.add_argument("--refresh", action="store_true", help="ignore cache freshness")
+    args = ap.parse_args()
+
+    cfg = yaml.safe_load((ROOT / "profile.yml").read_text()) or {}
+    handle = cfg.get("handle") or os.environ.get("GITHUB_REPOSITORY_OWNER")
+    if not handle:
+        sys.exit("profile.yml needs `handle:` (your GitHub username)")
+    cfg["handle"] = handle
+    theme = cfg.get("theme") or {}
+    pal = {m: svg.palette(theme, m) for m in MODES}
+    f = sources.Fetcher(offline=args.offline, refresh=args.refresh)
+    gh = f"https://github.com/{handle}"
+    print(f"Building profile for {handle}")
+
+    # ── data ──
+    repos = sources.github_repos(f, handle)
+    if repos is None:
+        print("  ! no repo data; featured cards and project list keep their last version")
+    by_name = {r["name"].lower(): r for r in (repos or [])}
+    for name, desc in (cfg.get("descriptions") or {}).items():
+        r = by_name.get(name.lower())
+        if r and not r.get("description"):
+            r["description"] = desc
+
+    cf = sources.codeforces(f, cfg["codeforces"]) if cfg.get("codeforces") else None
+    contrib = sources.github_contributions(f, handle)
+    langs = sources.github_languages(f, handle, repos or [], set(cfg.get("languages_ignore") or []))
+
+    v: dict[str, str] = {}
+
+    # ── banner ──
+    chips = [c for c in [cfg.get("headline"), cfg.get("location")] if c]
+    if cf and cf["info"].get("rating"):
+        chips.append(f"Codeforces {cf['info']['rating']}")
+    for m in MODES:
+        write(ASSETS / f"banner-{m}.svg", svg.banner(cfg, pal[m], chips))
+    v["banner"] = f'<p align="center">{picture("assets/banner", cfg.get("name") or handle, "100%")}</p>'
+
+    # ── nav ──
+    sections_present = {"featured-projects": bool(cfg.get("featured")),
+                        "get-in-touch": any((cfg.get("links") or {}).values()),
+                        "about-me": bool(cfg.get("about"))}
+    nav = []
+    for label, glyph, anchor in NAV:
+        if not sections_present.get(anchor, True):
+            continue
+        for m in MODES:
+            write(ASSETS / "nav" / f"{slug(label)}-{m}.svg", svg.pill(label, glyph, pal[m]))
+        nav.append(f'<a href="#{anchor}">{picture(f"assets/nav/{slug(label)}", label)}</a>')
+    v["nav"] = '<p align="center">\n' + "&nbsp;\n".join(nav) + "\n</p>"
+
+    # ── about ──
+    about = list(cfg.get("about") or [])
+    meta = []
+    if cfg.get("now_building"):
+        meta.append(f"🔨 **Now building:** {cfg['now_building']}")
+    if cfg.get("location"):
+        meta.append(f"📍 {cfg['location']}")
+    v["about"] = "\n\n".join(about + ([" &nbsp;·&nbsp; ".join(meta)] if meta else []))
+
+    # ── start here ──
+    rows = []
+    for s in cfg.get("start_here") or []:
+        r = by_name.get(str(s.get("repo", "")).lower())
+        name = r["name"] if r else s.get("repo")
+        rows.append(f'<tr><td>If you like <b>{svg.esc(s.get("like", ""))}</b></td>'
+                    f'<td><a href="{gh}/{name}"><b>{svg.esc(name)}</b></a></td>'
+                    f'<td>{svg.esc(s.get("why", ""))}</td></tr>')
+    if rows:
+        v["start_here"] = "<table>\n" + "\n".join(rows) + "\n</table>"
+
+    # ── featured cards ──
+    cards = []
+    for i, item in enumerate(cfg.get("featured") or []):
+        r = by_name.get(str(item["repo"]).lower())
+        base = f"assets/projects/{slug(item['repo'])}"
+        if r:
+            for m in MODES:
+                write(ROOT / f"{base}-{m}.svg", svg.project_card(r, item, pal[m], i))
+        elif not (ROOT / f"{base}-dark.svg").exists():
+            print(f"  ! featured repo not found: {item['repo']}")
+            continue
+        name = r["name"] if r else item["repo"]
+        cards.append(f'<a href="{gh}/{name}">{picture(base, item.get("title") or name, "49%")}</a>')
+    if cards:
+        v["featured"] = "\n\n".join(f'<p align="center">\n{cards[i]}\n{cards[i + 1] if i + 1 < len(cards) else ""}\n</p>'
+                                     for i in range(0, len(cards), 2))
+
+    # ── all projects ──
+    if repos:
+        cats = cfg.get("categories") or {}
+        seen, blocks = set(), []
+        groups = []
+        for cat, names in cats.items():
+            rs = [by_name[n.lower()] for n in names or [] if n.lower() in by_name]
+            seen |= {r["name"].lower() for r in rs}
+            groups.append((cat, rs))
+        rest = sorted((r for r in repos if r["name"].lower() not in seen),
+                      key=lambda r: r.get("pushed_at") or "", reverse=True)
+        if rest:
+            groups.append(("More", rest))
+        for cat, rs in groups:
+            if not rs:
+                continue
+            trs = "\n".join(
+                f'<tr><td><a href="{r["html_url"]}"><b>{svg.esc(r["name"])}</b></a></td>'
+                f'<td>{svg.esc(r.get("description") or "—")}</td>'
+                f'<td><code>{svg.esc(r.get("language") or "—")}</code></td>'
+                f'<td align="right">{"⭐ " + str(r["stargazers_count"]) if r.get("stargazers_count") else ""}</td></tr>'
+                for r in rs)
+            blocks.append(f"<details>\n<summary><b>{svg.esc(cat)}</b> &nbsp;<sub>{len(rs)} repos</sub></summary>\n<br>\n"
+                          f"<table>\n{trs}\n</table>\n</details>")
+        v["all_projects"] = "\n\n".join(blocks)
+
+    # ── skills ──
+    if cfg.get("skills"):
+        ids = ",".join(cfg["skills"])
+        v["skills"] = (f'<p align="center"><a href="https://skillicons.dev">'
+                       f'<img src="https://skillicons.dev/icons?i={ids}&perline=8" alt="{svg.esc(", ".join(cfg["skills"]))}">'
+                       f"</a></p>")
+
+    # ── stats ──
+    stats = {"handle": handle,
+             "contributions": contrib and contrib["total"],
+             "streak": contrib and contrib["streak"],
+             "repos": len(repos) if repos is not None else None,
+             "stars": sum(r.get("stargazers_count", 0) for r in repos) if repos is not None else None}
+    if repos is not None or not (ASSETS / "stats-dark.svg").exists():
+        for m in MODES:
+            write(ASSETS / f"stats-{m}.svg", svg.stats_card(stats, langs, pal[m]))
+    stat_imgs = [f'<a href="{gh}?tab=repositories">{picture("assets/stats", "GitHub stats", "49%")}</a>']
+    if cfg.get("codeforces"):
+        if cf:
+            for m in MODES:
+                write(ASSETS / f"codeforces-{m}.svg", svg.cf_card(cf["info"], cf["history"], cf["solved"], pal[m]))
+        if (ASSETS / "codeforces-dark.svg").exists():
+            stat_imgs.append(f'<a href="https://codeforces.com/profile/{cfg["codeforces"]}">'
+                             f'{picture("assets/codeforces", "Codeforces rating", "49%")}</a>')
+    v["stats"] = '<p align="center">\n' + "\n".join(stat_imgs) + "\n</p>"
+
+    # ── snake (drawn by .github/workflows/snake.yml onto the `output` branch) ──
+    raw = f"https://raw.githubusercontent.com/{handle}/{handle}/output"
+    v["snake"] = (f'<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="{raw}/snake-dark.svg">'
+                  f'<img src="{raw}/snake-light.svg" alt="Snake eating my contribution graph" width="100%"></picture></p>')
+
+    # ── contact ──
+    links = cfg.get("links") or {}
+    contact = []
+    spec = [("linkedin", "LinkedIn", "in", lambda u: u),
+            ("email", "Email", "@", lambda u: f"mailto:{u}"),
+            ("website", "Website", "↗", lambda u: u)]
+    for key, label, glyph, href in spec:
+        if links.get(key):
+            for m in MODES:
+                write(ASSETS / "nav" / f"{key}-{m}.svg", svg.pill(label, glyph, pal[m]))
+            contact.append(f'<a href="{svg.esc(href(links[key]))}">{picture(f"assets/nav/{key}", label)}</a>')
+    if contact and cfg.get("codeforces"):
+        for m in MODES:
+            write(ASSETS / "nav" / f"codeforces-{m}.svg", svg.pill("Codeforces", "◢", pal[m]))
+        contact.append(f'<a href="https://codeforces.com/profile/{cfg["codeforces"]}">'
+                       f'{picture("assets/nav/codeforces", "Codeforces")}</a>')
+    if contact:
+        v["contact"] = '<p align="center">\n' + "&nbsp;\n".join(contact) + "\n</p>"
+
+    # ── footer ──
+    src = cfg.get("template_source") or f"{handle}/{handle}"
+    today = dt.datetime.now(dt.timezone.utc).strftime("%d %b %Y")
+    v["footer"] = (
+        '<p align="center"><sub>\n'
+        f'✨ Like this profile? It\'s a template. Open <a href="https://github.com/{src}"><b>{src}</b></a>, '
+        "click <b>Use this template</b>, edit <code>profile.yml</code>, and the daily Action builds yours.\n"
+        f"<br>Cards are drawn from live GitHub &amp; Codeforces data · last refreshed {today}\n"
+        "</sub></p>")
+
+    tmpl = (ROOT / "templates" / "README.md.tmpl").read_text()
+    write(ROOT / "README.md", render_template(tmpl, v))
+    print(f"  ✓ README.md + {sum(1 for _ in ASSETS.rglob('*.svg'))} SVGs")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

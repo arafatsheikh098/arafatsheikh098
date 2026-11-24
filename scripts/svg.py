@@ -113,6 +113,14 @@ def truncate(s: str, size: float, max_w: float, bold: bool = False) -> str:
     return s.rstrip() + "…"
 
 
+def strip_stack(desc: str) -> str:
+    """Drop a trailing 'A · B · C' tech list (the card shows chips instead)."""
+    head, sep, tail = desc.rpartition(". ")
+    if sep and tail.count("·") >= 1:
+        return head + "."
+    return desc
+
+
 def palette(theme: dict, mode: str) -> dict:
     t = theme.get(mode, {})
     if mode == "dark":
@@ -139,11 +147,13 @@ def _svg(w: int, h: int, body: str, title: str) -> str:
 
 
 def chip(x: float, y: float, label: str, p: dict, size: float = 12,
-         fill: str | None = None, color: str | None = None, h: float = 24) -> tuple[str, float]:
+         fill: str | None = None, color: str | None = None, h: float = 24,
+         stroke: str | None = None) -> tuple[str, float]:
     w = text_width(label, size) + 22
+    edge = f' stroke="{stroke}" stroke-opacity=".7"' if stroke else ""
     svg = (
         f'<rect x="{x:.1f}" y="{y:.1f}" width="{w:.1f}" height="{h}" rx="{h / 2}" '
-        f'fill="{fill or p["chip"]}"/>'
+        f'fill="{fill or p["chip"]}"{edge}/>'
         f'<text x="{x + w / 2:.1f}" y="{y + h / 2 + size * 0.36:.1f}" text-anchor="middle" '
         f'font-size="{size}" fill="{color or p["chip_text"]}" class="f">{esc(label)}</text>'
     )
@@ -152,7 +162,7 @@ def chip(x: float, y: float, label: str, p: dict, size: float = 12,
 
 BASE_CSS = (
     f".f{{font-family:{FONT}}}.m{{font-family:{MONO}}}"
-    "@media (prefers-reduced-motion: reduce){*{animation:none!important}}"
+    "@media (prefers-reduced-motion: reduce){*{animation:none!important}.tag{opacity:0!important}.tag0{opacity:1!important}}"
 )
 
 
@@ -164,7 +174,7 @@ def _rotation_css(n: int, period: float) -> str:
     slot = 100 / n
     a, b, c = slot * 0.10, slot * 0.86, slot * 0.98
     css = (
-        f".tag{{opacity:0;animation:rot {period:.1f}s ease-in-out infinite}}"
+        f".tag{{opacity:0;animation:rot {period:.1f}s ease-in-out infinite}}.tag0{{opacity:1}}"
         f"@keyframes rot{{0%{{opacity:0;transform:translateY(12px)}}"
         f"{a:.2f}%{{opacity:1;transform:translateY(0)}}"
         f"{b:.2f}%{{opacity:1;transform:translateY(0)}}"
@@ -199,10 +209,10 @@ def banner(cfg: dict, p: dict, chips: list[str]) -> str:
         ".w1{animation:flow 14s linear infinite}.w2{animation:flow 22s linear infinite}"
         ".w3{animation:flow 9s linear infinite}"
         "@keyframes flow{to{transform:translateX(-400px)}}"
-        ".sweep{stroke-dasharray:520;stroke-dashoffset:520;animation:draw 1.8s cubic-bezier(.2,.8,.2,1) .4s forwards}"
-        "@keyframes draw{to{stroke-dashoffset:0}}"
+        ".sweep{stroke-dasharray:520;animation:draw 1.8s cubic-bezier(.2,.8,.2,1) .4s backwards}"
+        "@keyframes draw{from{stroke-dashoffset:520}to{stroke-dashoffset:0}}"
         ".cur{animation:blink 1.1s step-end infinite}@keyframes blink{50%{opacity:0}}"
-        ".in{opacity:0;animation:in .9s ease-out forwards}"
+        ".in{animation:in .9s ease-out backwards}"
         "@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}"
         ".d1{animation-delay:.15s}.d2{animation-delay:.35s}.d3{animation-delay:.9s}"
         ".tw{animation:tw 3s ease-in-out infinite}@keyframes tw{50%{opacity:.15}}"
@@ -224,8 +234,8 @@ def banner(cfg: dict, p: dict, chips: list[str]) -> str:
 
     chip_svg, x = "", 60.0
     for c in chips:
-        s, w = chip(x, 232, c, p, size=12.5, h=26,
-                    fill=p["card_hi"] if dark else "#ffffff", color=p["text"])
+        s, w = chip(x, 230, c, p, size=13, h=28, fill=p["card"],
+                    color=p["text"], stroke=p["accent"])
         chip_svg += s
         x += w + 10
 
@@ -268,14 +278,14 @@ def project_card(repo: dict, item: dict, p: dict, idx: int = 0) -> str:
     lang = repo.get("language") or ""
     lc = LANG_COLORS.get(lang, p["faint"])
     title = item.get("title") or repo["name"]
-    desc = repo.get("description") or ""
+    desc = strip_stack(repo.get("description") or "")
     tag = (item.get("tag") or "").upper()
     delay = 1.2 + idx * 1.7
 
     css = BASE_CSS + (
         ".sh{animation:sh 9s ease-in-out infinite}"
         "@keyframes sh{0%{transform:translateX(-260px) skewX(-20deg)}35%,100%{transform:translateX(760px) skewX(-20deg)}}"
-        ".in{opacity:0;animation:in .7s ease-out forwards}"
+        ".in{animation:in .7s ease-out backwards}"
         "@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}"
     )
 
@@ -379,12 +389,12 @@ def cf_card(info: dict | None, history: list[dict], solved: int | None, p: dict)
     delta = history[-1]["newRating"] - history[-1]["oldRating"] if history else None
 
     css = BASE_CSS + (
-        ".ln{stroke-dasharray:1200;stroke-dashoffset:1200;animation:draw 2.4s ease-out .3s forwards}"
-        "@keyframes draw{to{stroke-dashoffset:0}}"
-        ".ar{opacity:0;animation:fade 1s ease-out 1.6s forwards}@keyframes fade{to{opacity:1}}"
+        ".ln{stroke-dasharray:1200;animation:draw 2.4s ease-out .3s backwards}"
+        "@keyframes draw{from{stroke-dashoffset:1200}to{stroke-dashoffset:0}}"
+        ".ar{animation:fade 1s ease-out 1.6s backwards}@keyframes fade{from{opacity:0}to{opacity:1}}"
         ".pl{transform-box:fill-box;transform-origin:center;animation:pl 2s ease-out 2.4s infinite}"
         "@keyframes pl{0%{transform:scale(1);opacity:.7}100%{transform:scale(3.2);opacity:0}}"
-        ".in{opacity:0;animation:fade .8s ease-out forwards}"
+        ".in{animation:fade .8s ease-out backwards}"
     )
 
     graph = ""
@@ -416,7 +426,7 @@ def cf_card(info: dict | None, history: list[dict], solved: int | None, p: dict)
     if solved is not None:
         items.append(f"{solved} solved")
     items.append(f"{contests} contests")
-    if delta is not None:
+    if delta is not None and delta > 0:
         items.append(f"last {'+' if delta >= 0 else '−'}{abs(delta)}")
     for it in items:
         c, w = chip(x, 168, it, p, size=12, h=24)
@@ -447,10 +457,10 @@ def cf_card(info: dict | None, history: list[dict], solved: int | None, p: dict)
 def stats_card(stats: dict, langs: list[tuple[str, float]], p: dict) -> str:
     W, H = 480, 210
     css = BASE_CSS + (
-        ".in{opacity:0;animation:in .7s ease-out forwards}"
+        ".in{animation:in .7s ease-out backwards}"
         "@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}"
-        ".bar{transform-box:fill-box;transform-origin:left;transform:scaleX(0);animation:grow 1.2s cubic-bezier(.2,.8,.2,1) forwards}"
-        "@keyframes grow{to{transform:scaleX(1)}}"
+        ".bar{transform-box:fill-box;transform-origin:left;animation:grow 1.2s cubic-bezier(.2,.8,.2,1) backwards}"
+        "@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}"
     )
 
     cells = [
