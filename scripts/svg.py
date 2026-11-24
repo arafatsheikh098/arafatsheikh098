@@ -840,8 +840,8 @@ def rhythm_card(contrib: dict, p: dict) -> str:
     per = [0] * 7
     for ds, v in days.items():
         per[_dt.date.fromisoformat(ds).weekday()] += v["count"]
+    best = per.index(max(per))
     top = max(per) or 1
-    best = per.index(top)
     counts = [v["count"] for v in days.values()]
     active = [c for c in counts if c]
     avg = sum(active) / len(active) if active else 0
