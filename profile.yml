@@ -1,0 +1,96 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  profile.yml: the only file you need to edit.
+#  `python scripts/build.py` (or the daily GitHub Action) reads this, pulls
+#  live data from GitHub + Codeforces, draws the SVG cards in assets/ and
+#  writes README.md. Leave any value empty ("" or []) to hide that part.
+# ─────────────────────────────────────────────────────────────────────────────
+
+handle: arafatsheikh098            # your GitHub username
+name: Arafat Sheikh
+location: Chattogram, Bangladesh
+headline: CSE @ University of Chittagong
+
+# Lines that rotate under your name in the animated banner.
+taglines:
+  - I build real-time and geo-aware systems
+  - CRDTs, PostGIS, WebSockets, FastAPI
+  - Competitive programmer on Codeforces
+  - Shipping tools people in Chattogram actually use
+
+about:
+  - I'm a CSE student at the **University of Chittagong** who likes turning messy real-world problems into software that's easy to use.
+  - Most of my work is full-stack, using **Python/FastAPI** or **TypeScript/React**, with a soft spot for maps, real-time sync and the occasional compiler.
+now_building: A Bangladesh bus-driving simulator in Unreal Engine 5
+
+# "New here?" guide: helps visitors pick where to start.
+start_here:
+  - like: Hard engineering
+    repo: weave
+    why: A collaborative editor on a CRDT I wrote from scratch
+  - like: Maps & civic tech
+    repo: floodwatch-ctg
+    why: Live crowdsourced waterlogging map for Chattogram
+  - like: Competitive programming
+    repo: upsolve
+    why: Finds your weakest Codeforces tags and plans practice
+  - like: Applied AI
+    repo: DocMind
+    why: Ask your PDFs questions, get answers with page citations
+
+# Big cards. `title` and `stack` are optional overrides.
+featured:
+  - repo: weave
+    stack: [TypeScript, React, Node, Postgres]
+    tag: Real-time
+  - repo: floodwatch-ctg
+    stack: [FastAPI, PostGIS, React, Telegram]
+    tag: Geo
+  - repo: upsolve
+    stack: [FastAPI, React, PostgreSQL, Redis]
+    tag: Algorithms
+  - repo: Service_Technician_Finder_Project
+    title: Technician Finder
+    stack: [React, TypeScript, PostGIS, Socket.IO]
+    tag: Marketplace
+  - repo: DocMind
+    stack: [Python, RAG, FastAPI]
+    tag: AI
+  - repo: ArborVision
+    stack: [Python, PyTorch, OpenCV]
+    tag: Vision
+
+# Every repo, grouped. Repos not listed land in "More".
+categories:
+  Real-time & geo: [weave, floodwatch-ctg, Service_Technician_Finder_Project, CampusRide]
+  AI, ML & vision: [DocMind, ArborVision, LeafCheck, image-datacheck, Text-Extractor]
+  Products & tools: [Stratum, SplitMate, PocketLedger, ShopDesk, BloodLinK, CampusFound, DeptHub]
+  Systems & CP: [upsolve, MiniLang-Compiler, OS-Based-Custom-Search-Engine, BUP-CSE-Fest-2026-Hackathon-Preliminary]
+  Early web work: [University_Webpage, University-Website-Design, NewsPaper_Site, blog_site, healthcare-frontend]
+
+# Descriptions for repos that don't have one on GitHub.
+descriptions:
+  MiniLang-Compiler: Complete six-phase compiler for MiniLang, a statically typed, block-scoped language
+  BUP-CSE-Fest-2026-Hackathon-Preliminary: "GridWise: smart-campus energy optimisation API (BUP CSE Fest 2026 hackathon)"
+  University-Website-Design: University website UI built with React
+  NewsPaper_Site: Newspaper-style site built with Django
+  blog_site: Blog platform built with Django
+
+# Icon ids from https://skillicons.dev
+skills: [py, ts, js, c, cpp, react, nodejs, fastapi, django, postgres, redis, docker, linux, git, tailwind, pytorch]
+
+codeforces: arafatsheikh098           # "" to hide the Codeforces card
+
+links:
+  linkedin: ""                       # e.g. https://www.linkedin.com/in/your-name
+  email: ""                          # e.g. you@example.com
+  website: ""                        # e.g. https://your-site.dev
+
+# Ignored when computing "top languages".
+languages_ignore: [Dockerfile, Makefile, Shell, Mako, Procfile, Batchfile, PowerShell, Jinja]
+
+theme:
+  dark:  { accent: "#34d399", accent2: "#fb3b5a" }   # Bangladesh green & red
+  light: { accent: "#047857", accent2: "#e11d48" }
+
+# Keep this so people who like your page can find where it came from.
+template_source: arafatsheikh098/arafatsheikh098
