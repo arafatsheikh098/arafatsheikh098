@@ -20,7 +20,7 @@ taglines:
 about:
   - I'm a CSE student at the **University of Chittagong** who likes turning messy real-world problems into software that's easy to use.
   - Most of my work is full-stack, using **Python/FastAPI** or **TypeScript/React**, with a soft spot for maps, real-time sync and the occasional compiler.
-now_building: A Bangladesh bus-driving simulator in Unreal Engine 5
+now_building: a Bangladesh bus-driving simulator in Unreal Engine 5
 
 # "New here?" guide: helps visitors pick where to start.
 start_here:
@@ -111,6 +111,23 @@ links:
   linkedin: ""                       # e.g. https://www.linkedin.com/in/your-name
   email: ""                          # e.g. you@example.com
   website: ""                        # e.g. https://your-site.dev
+
+# ── Left sidebar (GitHub's own column, set in Settings → Public profile) ──
+# The README can't draw there. These values are shown in the local preview,
+# and if you add a PROFILE_TOKEN secret the daily Action writes bio, status,
+# company, location and website to your account. Without the token nothing
+# is changed. The bio is limited to 160 characters and fills in live values:
+#   {cf_rating} {cf_rank} {cf_solved} {contributions} {streak} {repos}
+#   {stars} {latest_repo} {now_building}
+sidebar:
+  bio: "CSE @ University of Chittagong · real-time & geo systems · Codeforces {cf_rating} · {contributions} contributions this year · latest: {latest_repo}"
+  status: { emoji: "🔨", text: "Building {now_building}" }
+  company: University of Chittagong
+  location: Chattogram, Bangladesh
+  website: ""                        # falls back to links.website
+  timezone: "+06:00"                 # shown as local time in the preview
+  socials:                           # add these yourself (max 4) in Settings
+    - https://codeforces.com/profile/arafatsheikh098
 
 # Ignored when computing "top languages".
 languages_ignore: [Dockerfile, Makefile, Shell, Mako, Procfile, Batchfile, PowerShell, Jinja]

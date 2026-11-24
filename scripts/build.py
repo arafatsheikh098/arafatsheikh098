@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import json
 import os
 import re
 import sys
@@ -62,6 +63,61 @@ def picture(base: str, alt: str, width: str | None = None) -> str:
             f'<img src="{base}-light.svg" alt="{svg.esc(alt)}"{w}></picture>')
 
 
+class _Blank(dict):
+    def __missing__(self, key):
+        return ""
+
+
+def fill(text: str, ctx: dict) -> str:
+    """Fill {placeholders} per " · " segment; segments with an empty value are dropped."""
+    parts = []
+    for seg in (text or "").split(" · "):
+        keys = re.findall(r"\{(\w+)\}", seg)
+        if any(str(ctx.get(k, "")).strip() == "" for k in keys):
+            continue
+        parts.append(seg.format_map(_Blank(ctx)).strip())
+    return " · ".join(p for p in parts if p)
+
+
+def clip(text: str, limit: int) -> str:
+    if len(text) <= limit:
+        return text
+    cut = text[:limit - 1]
+    cut = cut[:cut.rfind(" ")] if " " in cut else cut
+    return cut.rstrip(" ·,;:-") + "…"
+
+
+def build_sidebar(cfg: dict, repos, by_name, cf, contrib, user) -> dict:
+    """Resolve the sidebar block (bio placeholders etc.) for preview + sync."""
+    sb = cfg.get("sidebar") or {}
+    titles = {str(it["repo"]).lower(): it.get("title") for it in cfg.get("featured") or []}
+    latest = None
+    if repos:
+        r = max(repos, key=lambda r: r.get("pushed_at") or "")
+        latest = titles.get(r["name"].lower()) or r["name"]
+    info = (cf or {}).get("info") or {}
+    ctx = {
+        "cf_rating": info.get("rating", ""), "cf_rank": info.get("rank", ""),
+        "cf_solved": (cf or {}).get("solved") or "",
+        "contributions": f'{contrib["total"]:,}' if contrib and contrib.get("total") else "",
+        "streak": contrib.get("streak", "") if contrib else "",
+        "repos": len(repos) if repos else "", "stars": sum(r.get("stargazers_count", 0) for r in repos or []),
+        "latest_repo": latest or "", "now_building": cfg.get("now_building", ""),
+    }
+    status = sb.get("status") or {}
+    return {
+        "bio": clip(fill(sb.get("bio", ""), ctx), 160),
+        "status_emoji": status.get("emoji", ""),
+        "status_text": clip(fill(status.get("text", ""), ctx), 80),
+        "company": sb.get("company", ""),
+        "location": sb.get("location") or cfg.get("location", ""),
+        "website": sb.get("website") or (cfg.get("links") or {}).get("website", ""),
+        "timezone": sb.get("timezone", ""),
+        "socials": (sb.get("socials") or [])[:4],
+        "followers": (user or {}).get("followers"), "following": (user or {}).get("following"),
+    }
+
+
 def render_template(tmpl: str, values: dict[str, str]) -> str:
     def section(m):
         return m.group(2) if values.get(m.group(1), "").strip() else ""
@@ -101,6 +157,7 @@ def main() -> int:
     contrib = sources.github_contributions(f, handle)
     langs = sources.github_languages(f, handle, repos or [], set(cfg.get("languages_ignore") or []))
     events = sources.github_events(f, handle) if cfg.get("activity") else None
+    user = f.get(f"https://api.github.com/users/{handle}")
     featured_names = [r["name"] for it in cfg.get("featured") or []
                       if (r := by_name.get(str(it["repo"]).lower()))]
     traffic = sources.repo_traffic(handle, featured_names, ROOT / "data" / "traffic.json")
@@ -303,6 +360,12 @@ def main() -> int:
         "click <b>Use this template</b>, edit <code>profile.yml</code>, and the daily Action builds yours.\n"
         f"<br>Cards are drawn from live GitHub &amp; Codeforces data · last refreshed {today}\n"
         "</sub></p>")
+
+    # ── sidebar (not part of the README: read by preview.py and sync_profile.py) ──
+    if cfg.get("sidebar"):
+        sidebar = build_sidebar(cfg, repos, by_name, cf, contrib, user if isinstance(user, dict) else None)
+        (sources.CACHE / "sidebar.json").write_text(json.dumps(sidebar, ensure_ascii=False, indent=1))
+        print(f"  ✓ bio ({len(sidebar['bio'])}/160): {sidebar['bio']}")
 
     tmpl = (ROOT / "templates" / "README.md.tmpl").read_text()
     write(ROOT / "README.md", render_template(tmpl, v))

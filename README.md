@@ -22,7 +22,7 @@ I'm a CSE student at the **University of Chittagong** who likes turning messy re
 
 Most of my work is full-stack, using **Python/FastAPI** or **TypeScript/React**, with a soft spot for maps, real-time sync and the occasional compiler.
 
-🔨 **Now building:** A Bangladesh bus-driving simulator in Unreal Engine 5 &nbsp;·&nbsp; 📍 Chattogram, Bangladesh
+🔨 **Now building:** a Bangladesh bus-driving simulator in Unreal Engine 5 &nbsp;·&nbsp; 📍 Chattogram, Bangladesh
 
 ### New here? Start with one of these
 
