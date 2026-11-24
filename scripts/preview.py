@@ -163,7 +163,8 @@ def aside(handle: str, cfg: dict) -> str:
     path = ROOT / ".cache" / "sidebar.json"
     sb = json.loads(path.read_text()) if path.exists() else {}
     name = cfg.get("name") or handle
-    out = [f'<aside><div class="av"><img src="https://github.com/{handle}.png?size=460" alt="">']
+    avatar = f"../{sb['avatar']}" if sb.get("avatar") else f"https://github.com/{handle}.png?size=460"
+    out = [f'<aside><div class="av"><img src="{e(avatar)}" alt="">']
     if sb.get("status_text"):
         out.append(f'<div class="st open" title="Status"><span class="e">{e(sb.get("status_emoji") or "💭")}</span>{e(sb["status_text"])}</div>')
     out.append(f'</div><h1>{e(name)}</h1><div class="h">{e(handle)}</div>')

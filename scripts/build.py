@@ -115,6 +115,7 @@ def build_sidebar(cfg: dict, repos, by_name, cf, contrib, user) -> dict:
         "timezone": sb.get("timezone", ""),
         "socials": (sb.get("socials") or [])[:4],
         "followers": (user or {}).get("followers"), "following": (user or {}).get("following"),
+        "avatar": sb.get("avatar", ""),
     }
 
 

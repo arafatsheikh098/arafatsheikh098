@@ -126,6 +126,7 @@ sidebar:
   location: Chattogram, Bangladesh
   website: ""                        # falls back to links.website
   timezone: "+06:00"                 # shown as local time in the preview
+  avatar: assets/avatar.jpg          # preview only: upload it in Settings → Public profile
   socials:                           # add these yourself (max 4) in Settings
     - https://codeforces.com/profile/arafatsheikh098
 
