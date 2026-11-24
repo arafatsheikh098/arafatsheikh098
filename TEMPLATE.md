@@ -28,6 +28,7 @@ This profile page is generated. Every card is a hand-drawn SVG built from **one 
 | `skills` | Icon ids from [skillicons.dev](https://skillicons.dev) |
 | `codeforces` | Your handle, or `""` to hide the card |
 | `links` | `linkedin`, `email`, `website`: shown as buttons when set |
+| `sidebar` | Bio (with live `{placeholders}`), status, company, location, website for GitHub's left column. See below. |
 | `theme` | `accent` / `accent2` colours for dark and light mode |
 | `template_source` | Credit line in the footer, so people can find the template |
 
@@ -39,6 +40,15 @@ GitHub only shows repo traffic to the owner, so the default Action token can't r
 2. In this repo go to **Settings → Secrets and variables → Actions → New secret** and name it `TRAFFIC_TOKEN`.
 
 GitHub keeps only 14 days of traffic. The Action saves each day to `data/traffic.json`, so the totals grow from the day you add the token.
+
+## Self-updating sidebar (optional)
+
+A README can't draw in GitHub's left column, but your account settings can. The `sidebar:` block holds a bio, status, company, location and website. The bio can include live values such as `{cf_rating}`, `{contributions}` and `{latest_repo}`.
+
+- **Without a token** these values only show in the local preview, so you can copy them into **Settings → Public profile** by hand.
+- **With a token** the daily Action keeps them in sync. Create a classic token with the **`user`** scope and save it as the secret `PROFILE_TOKEN`.
+
+Fields you leave empty are never touched. Try `python scripts/sync_profile.py --dry-run` to see what would change.
 
 ## Preview locally
 
