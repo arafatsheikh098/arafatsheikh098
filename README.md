@@ -52,6 +52,11 @@ Most of my work is full-stack, using **Python/FastAPI** or **TypeScript/React**,
 <a href="https://github.com/arafatsheikh098/ArborVision"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/arborvision-dark.svg"><img src="assets/projects/arborvision-light.svg" alt="ArborVision" width="49%"></picture></a>
 </p>
 
+<p align="center">
+<a href="https://github.com/arafatsheikh098/mohasorok"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/mohasorok-dark.svg"><img src="assets/projects/mohasorok-light.svg" alt="Mohasorok" width="49%"></picture></a>
+<a href="https://github.com/arafatsheikh098/photomate"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/photomate-dark.svg"><img src="assets/projects/photomate-light.svg" alt="PhotoMate" width="49%"></picture></a>
+</p>
+
 ### More projects in pictures
 
 <p align="center">
@@ -69,11 +74,12 @@ Most of my work is full-stack, using **Python/FastAPI** or **TypeScript/React**,
 ## All projects
 
 <details>
-<summary><b>Real-time &amp; geo</b> &nbsp;<sub>4 repos</sub></summary>
+<summary><b>Real-time &amp; geo</b> &nbsp;<sub>5 repos</sub></summary>
 <br>
 <table>
 <tr><td><a href="https://github.com/arafatsheikh098/weave"><b>weave</b></a></td><td>Real-time collaborative LaTeX &amp; Markdown editor on a CRDT written from scratch: live cursors, offline editing, sandboxed PDF compile. TypeScript · React · Node · Postgres</td><td><code>TypeScript</code></td><td align="right"></td></tr>
 <tr><td><a href="https://github.com/arafatsheikh098/floodwatch-ctg"><b>floodwatch-ctg</b></a></td><td>Crowdsourced waterlogging map for Chattogram: phone reports with photos, live rainfall, ward-level flood risk and Telegram alerts. Bangla/English · FastAPI · PostGIS · React</td><td><code>Python</code></td><td align="right"></td></tr>
+<tr><td><a href="https://github.com/arafatsheikh098/mohasorok"><b>mohasorok</b></a></td><td>মহাসড়ক Mohasorok: Bangladesh bus simulator in the browser (Dhaka ⇄ Chattogram, N1)</td><td><code>JavaScript</code></td><td align="right"></td></tr>
 <tr><td><a href="https://github.com/arafatsheikh098/Service_Technician_Finder_Project"><b>Service_Technician_Finder_Project</b></a></td><td>Geo-aware home-services marketplace: find, book and live-track verified technicians. React · TypeScript · PostGIS · Socket.IO · Docker</td><td><code>TypeScript</code></td><td align="right"></td></tr>
 <tr><td><a href="https://github.com/arafatsheikh098/CampusRide"><b>CampusRide</b></a></td><td>CampusRide is a service that lets students offer and find shared rides between named pickup points. Verified-student commute sharing for a single campus.</td><td><code>Python</code></td><td align="right"></td></tr>
 </table>
@@ -92,9 +98,10 @@ Most of my work is full-stack, using **Python/FastAPI** or **TypeScript/React**,
 </details>
 
 <details>
-<summary><b>Products &amp; tools</b> &nbsp;<sub>7 repos</sub></summary>
+<summary><b>Products &amp; tools</b> &nbsp;<sub>8 repos</sub></summary>
 <br>
 <table>
+<tr><td><a href="https://github.com/arafatsheikh098/photomate"><b>photomate</b></a></td><td>Free image resizer, compressor &amp; passport photo maker that runs in your browser: compress to KB, resize, convert, remove background, signature 300x80, images to PDF. No upload.</td><td><code>TypeScript</code></td><td align="right"></td></tr>
 <tr><td><a href="https://github.com/arafatsheikh098/Stratum"><b>Stratum</b></a></td><td>Stratum is an enterprise-grade, full-stack Project Management and Issue Tracking SaaS platform. It features JWT-based role authorization, interactive drag-and-drop Kanban boards, sprint burndown velocity metrics, subtask checklists, in-app notifications, and audit logging.</td><td><code>JavaScript</code></td><td align="right"></td></tr>
 <tr><td><a href="https://github.com/arafatsheikh098/SplitMate"><b>SplitMate</b></a></td><td>Shared expenses and balances for friend groups. Everything is computed from the ledger on every read, so balances can never drift.</td><td><code>Python</code></td><td align="right"></td></tr>
 <tr><td><a href="https://github.com/arafatsheikh098/PocketLedger"><b>PocketLedger</b></a></td><td>Local-first personal finance tracker: import statements, categorize, budget, and see where the money goes.</td><td><code>Python</code></td><td align="right"></td></tr>
@@ -152,5 +159,5 @@ Most of my work is full-stack, using **Python/FastAPI** or **TypeScript/React**,
 
 <p align="center"><sub>
 ✨ Like this profile? It's a template. Open <a href="https://github.com/arafatsheikh098/arafatsheikh098"><b>arafatsheikh098/arafatsheikh098</b></a>, click <b>Use this template</b>, edit <code>profile.yml</code>, and the daily Action builds yours.
-<br>Cards are drawn from live GitHub &amp; Codeforces data · last refreshed 24 Nov 2026
+<br>Cards are drawn from live GitHub &amp; Codeforces data · last refreshed 25 Nov 2026
 </sub></p>
