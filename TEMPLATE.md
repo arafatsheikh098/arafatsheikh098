@@ -19,7 +19,7 @@ This profile page is generated. Every card is a hand-drawn SVG built from **one 
 | `taglines` | Lines that rotate under your name |
 | `about`, `now_building` | The "About me" section |
 | `start_here` | The "New here?" guide pointing visitors to a repo |
-| `featured` | Repos drawn as big cards. `shots` = screenshot paths inside that repo, shown as a slideshow in a browser frame; optional `title`, `stack` chips, `tag` |
+| `featured` | Repos drawn as big cards. `shots` = screenshot paths inside that repo (or `./` paths to images kept in this profile repo), shown as a slideshow in a browser frame; optional `title`, `stack` chips, `tag` |
 | `gallery` | Smaller screenshot thumbnails of more repos (`repo`, `shots`, optional `caption`) |
 | `activity` | Contribution heatmap, recent-activity timeline and weekday rhythm |
 | `views_counter` | Live "Profile views" badge |

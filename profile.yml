@@ -38,7 +38,8 @@ start_here:
     why: Ask your PDFs questions, get answers with page citations
 
 # Big cards with a screenshot slideshow in a browser frame.
-# `shots` are paths inside that repo (cycled every few seconds); without
+# `shots` are paths inside that repo, or ./paths to images kept in this
+# profile repo (cycled every few seconds); without
 # them the card falls back to a text-only design. `title`, `stack`, `tag`
 # are optional.
 featured:
@@ -67,6 +68,16 @@ featured:
     shots: [docs/screenshots/01-platform-home.png, docs/screenshots/03-compare-results.png, docs/screenshots/02-upload-run.png]
     stack: [Python, PyTorch, OpenCV]
     tag: Vision
+  - repo: mohasorok
+    shots: [./assets/shots/mohasorok-chase.jpg, ./assets/shots/mohasorok-cab.jpg]
+    title: Mohasorok
+    stack: [JavaScript, three.js, WebGL]
+    tag: Game
+  - repo: photomate
+    shots: [docs/home.png, docs/passport.png, docs/compress-dark.png]
+    title: PhotoMate
+    stack: [TypeScript, PWA, ONNX Runtime Web]
+    tag: Privacy
 
 # "In pictures" strip: smaller screenshot thumbnails of more projects.
 gallery:
@@ -86,9 +97,9 @@ gallery:
 
 # Every repo, grouped. Repos not listed land in "More".
 categories:
-  Real-time & geo: [weave, floodwatch-ctg, Service_Technician_Finder_Project, CampusRide]
+  Real-time & geo: [weave, floodwatch-ctg, mohasorok, Service_Technician_Finder_Project, CampusRide]
   AI, ML & vision: [DocMind, ArborVision, LeafCheck, image-datacheck, Text-Extractor]
-  Products & tools: [Stratum, SplitMate, PocketLedger, ShopDesk, BloodLinK, CampusFound, DeptHub]
+  Products & tools: [photomate, Stratum, SplitMate, PocketLedger, ShopDesk, BloodLinK, CampusFound, DeptHub]
   Systems & CP: [upsolve, MiniLang-Compiler, OS-Based-Custom-Search-Engine, BUP-CSE-Fest-2026-Hackathon-Preliminary]
   Early web work: [University_Webpage, University-Website-Design, NewsPaper_Site, blog_site, healthcare-frontend]
 

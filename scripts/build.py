@@ -37,7 +37,11 @@ GALLERY_VIEWPORT = (300, 148)    # svg.gallery_card browser viewport
 def load_shots(f, handle: str, repo: str, paths: list[str], size: tuple[int, int]) -> list[str]:
     out = []
     for path in paths or []:
-        data = f.get_bytes(f"https://raw.githubusercontent.com/{handle}/{repo}/HEAD/{path.lstrip('/')}")
+        if path.startswith("./"):  # a file kept in this profile repo (for repos without screenshots)
+            local = ROOT / path[2:]
+            data = local.read_bytes() if local.is_file() else None
+        else:
+            data = f.get_bytes(f"https://raw.githubusercontent.com/{handle}/{repo}/HEAD/{path.lstrip('/')}")
         uri = shots.fit(data, *size) if data else None
         if uri:
             out.append(uri)
