@@ -36,6 +36,9 @@ start_here:
   - like: Applied AI
     repo: DocMind
     why: Ask your PDFs questions, get answers with page citations
+  - like: Learning ML from zero
+    repo: learnai
+    why: 33 playable lessons on ML, deep learning and Transformers
 
 # Big cards with a screenshot slideshow in a browser frame.
 # `shots` are paths inside that repo, or ./paths to images kept in this
@@ -78,6 +81,16 @@ featured:
     title: PhotoMate
     stack: [TypeScript, PWA, ONNX Runtime Web]
     tag: Privacy
+  - repo: bus-ticket-booking
+    shots: [docs/screenshots/live-seat-map.png, docs/screenshots/seat-selected.png, docs/screenshots/ticket.png]
+    title: Bus Ticket Booking
+    stack: [FastAPI, PostgreSQL, React, WebSockets]
+    tag: Concurrency
+  - repo: learnai
+    shots: [./assets/shots/learnai-home.jpg, assets/img/gallery/dl-training-live-dark.webp, assets/img/gallery/dl-cnn-dark.webp]
+    title: LearnAI
+    stack: [JavaScript, Canvas, No build step]
+    tag: Education
 
 # "In pictures" strip: smaller screenshot thumbnails of more projects.
 gallery:
@@ -97,8 +110,8 @@ gallery:
 
 # Every repo, grouped. Repos not listed land in "More".
 categories:
-  Real-time & geo: [weave, floodwatch-ctg, mohasorok, Service_Technician_Finder_Project, CampusRide]
-  AI, ML & vision: [DocMind, ArborVision, LeafCheck, image-datacheck, Text-Extractor]
+  Real-time & geo: [weave, bus-ticket-booking, floodwatch-ctg, mohasorok, Service_Technician_Finder_Project, CampusRide]
+  AI, ML & vision: [learnai, DocMind, ArborVision, LeafCheck, image-datacheck, Text-Extractor]
   Products & tools: [photomate, Stratum, SplitMate, PocketLedger, ShopDesk, BloodLinK, CampusFound, DeptHub]
   Systems & CP: [upsolve, MiniLang-Compiler, OS-Based-Custom-Search-Engine, BUP-CSE-Fest-2026-Hackathon-Preliminary]
   Early web work: [University_Webpage, University-Website-Design, NewsPaper_Site, blog_site, healthcare-frontend]
@@ -121,7 +134,7 @@ codeforces: arafatsheikh098           # "" to hide the Codeforces card
 links:
   linkedin: ""                       # e.g. https://www.linkedin.com/in/your-name
   email: ""                          # e.g. you@example.com
-  website: ""                        # e.g. https://your-site.dev
+  website: https://arafatsheikh098.github.io/   # portfolio
 
 # ── Left sidebar (GitHub's own column, set in Settings → Public profile) ──
 # The README can't draw there. These values are shown in the local preview,
