@@ -6,7 +6,8 @@
 <a href="#about-me"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/nav/about-dark.svg"><img src="assets/nav/about-light.svg" alt="About"></picture></a>&nbsp;
 <a href="#featured-projects"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/nav/projects-dark.svg"><img src="assets/nav/projects-light.svg" alt="Projects"></picture></a>&nbsp;
 <a href="#activity"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/nav/activity-dark.svg"><img src="assets/nav/activity-light.svg" alt="Activity"></picture></a>&nbsp;
-<a href="#live-stats"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/nav/stats-dark.svg"><img src="assets/nav/stats-light.svg" alt="Stats"></picture></a>
+<a href="#live-stats"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/nav/stats-dark.svg"><img src="assets/nav/stats-light.svg" alt="Stats"></picture></a>&nbsp;
+<a href="#get-in-touch"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/nav/contact-dark.svg"><img src="assets/nav/contact-light.svg" alt="Contact"></picture></a>
 </p>
 
 <p align="center">
@@ -31,6 +32,7 @@ Most of my work is full-stack, using **Python/FastAPI** or **TypeScript/React**,
 <tr><td>If you like <b>Maps &amp; civic tech</b></td><td><a href="https://github.com/arafatsheikh098/floodwatch-ctg"><b>floodwatch-ctg</b></a></td><td>Live crowdsourced waterlogging map for Chattogram</td></tr>
 <tr><td>If you like <b>Competitive programming</b></td><td><a href="https://github.com/arafatsheikh098/upsolve"><b>upsolve</b></a></td><td>Finds your weakest Codeforces tags and plans practice</td></tr>
 <tr><td>If you like <b>Applied AI</b></td><td><a href="https://github.com/arafatsheikh098/DocMind"><b>DocMind</b></a></td><td>Ask your PDFs questions, get answers with page citations</td></tr>
+<tr><td>If you like <b>Learning ML from zero</b></td><td><a href="https://github.com/arafatsheikh098/learnai"><b>learnai</b></a></td><td>33 playable lessons on ML, deep learning and Transformers</td></tr>
 </table>
 
 ## Featured projects
@@ -57,6 +59,11 @@ Most of my work is full-stack, using **Python/FastAPI** or **TypeScript/React**,
 <a href="https://github.com/arafatsheikh098/photomate"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/photomate-dark.svg"><img src="assets/projects/photomate-light.svg" alt="PhotoMate" width="49%"></picture></a>
 </p>
 
+<p align="center">
+<a href="https://github.com/arafatsheikh098/bus-ticket-booking"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/bus-ticket-booking-dark.svg"><img src="assets/projects/bus-ticket-booking-light.svg" alt="Bus Ticket Booking" width="49%"></picture></a>
+<a href="https://github.com/arafatsheikh098/learnai"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/learnai-dark.svg"><img src="assets/projects/learnai-light.svg" alt="LearnAI" width="49%"></picture></a>
+</p>
+
 ### More projects in pictures
 
 <p align="center">
@@ -74,10 +81,11 @@ Most of my work is full-stack, using **Python/FastAPI** or **TypeScript/React**,
 ## All projects
 
 <details>
-<summary><b>Real-time &amp; geo</b> &nbsp;<sub>5 repos</sub></summary>
+<summary><b>Real-time &amp; geo</b> &nbsp;<sub>6 repos</sub></summary>
 <br>
 <table>
 <tr><td><a href="https://github.com/arafatsheikh098/weave"><b>weave</b></a></td><td>Real-time collaborative LaTeX &amp; Markdown editor on a CRDT written from scratch: live cursors, offline editing, sandboxed PDF compile. TypeScript · React · Node · Postgres</td><td><code>TypeScript</code></td><td align="right"></td></tr>
+<tr><td><a href="https://github.com/arafatsheikh098/bus-ticket-booking"><b>bus-ticket-booking</b></a></td><td>Intercity bus ticket booking for Bangladesh: live seat maps, 5-minute seat holds with Postgres row locks, and a chaos-tested payment flow. FastAPI, PostgreSQL, React, WebSockets, Docker.</td><td><code>Python</code></td><td align="right"></td></tr>
 <tr><td><a href="https://github.com/arafatsheikh098/floodwatch-ctg"><b>floodwatch-ctg</b></a></td><td>Crowdsourced waterlogging map for Chattogram: phone reports with photos, live rainfall, ward-level flood risk and Telegram alerts. Bangla/English · FastAPI · PostGIS · React</td><td><code>Python</code></td><td align="right"></td></tr>
 <tr><td><a href="https://github.com/arafatsheikh098/mohasorok"><b>mohasorok</b></a></td><td>মহাসড়ক Mohasorok: Bangladesh bus simulator in the browser (Dhaka ⇄ Chattogram, N1)</td><td><code>JavaScript</code></td><td align="right"></td></tr>
 <tr><td><a href="https://github.com/arafatsheikh098/Service_Technician_Finder_Project"><b>Service_Technician_Finder_Project</b></a></td><td>Geo-aware home-services marketplace: find, book and live-track verified technicians. React · TypeScript · PostGIS · Socket.IO · Docker</td><td><code>TypeScript</code></td><td align="right"></td></tr>
@@ -86,9 +94,10 @@ Most of my work is full-stack, using **Python/FastAPI** or **TypeScript/React**,
 </details>
 
 <details>
-<summary><b>AI, ML &amp; vision</b> &nbsp;<sub>5 repos</sub></summary>
+<summary><b>AI, ML &amp; vision</b> &nbsp;<sub>6 repos</sub></summary>
 <br>
 <table>
+<tr><td><a href="https://github.com/arafatsheikh098/learnai"><b>learnai</b></a></td><td>Learn Machine Learning &amp; Deep Learning by playing with it — 20 interactive lessons in plain words, live visuals, quizzes. Free, no sign-up, works offline.</td><td><code>HTML</code></td><td align="right"></td></tr>
 <tr><td><a href="https://github.com/arafatsheikh098/DocMind"><b>DocMind</b></a></td><td>Ask questions about your own PDF research papers and technical documents, and get answers that cite the exact page they came from — or an explicit &quot;I don&#x27;t know&quot; when your documents do not contain the answer.</td><td><code>Python</code></td><td align="right"></td></tr>
 <tr><td><a href="https://github.com/arafatsheikh098/ArborVision"><b>ArborVision</b></a></td><td>Computer Vision Benchmarking Platform — upload images, run multiple vision models side-by-side, and compare their predictions and metrics (classification, instance segmentation, precision/recall/F1, inference time).</td><td><code>Python</code></td><td align="right"></td></tr>
 <tr><td><a href="https://github.com/arafatsheikh098/LeafCheck"><b>LeafCheck</b></a></td><td>A small web app that identifies 9 plant species from a single leaf photo. Take or upload a photo, get the top three guesses with confidence, and read a short care note (light, water, soil, common pests) in English or Bangla.</td><td><code>Python</code></td><td align="right"></td></tr>
@@ -135,15 +144,6 @@ Most of my work is full-stack, using **Python/FastAPI** or **TypeScript/React**,
 </table>
 </details>
 
-<details>
-<summary><b>More</b> &nbsp;<sub>2 repos</sub></summary>
-<br>
-<table>
-<tr><td><a href="https://github.com/arafatsheikh098/learnai"><b>learnai</b></a></td><td>Learn Machine Learning &amp; Deep Learning by playing with it — 20 interactive lessons in plain words, live visuals, quizzes. Free, no sign-up, works offline.</td><td><code>HTML</code></td><td align="right"></td></tr>
-<tr><td><a href="https://github.com/arafatsheikh098/bus-ticket-booking"><b>bus-ticket-booking</b></a></td><td>Intercity bus ticket booking for Bangladesh: live seat maps, 5-minute seat holds with Postgres row locks, and a chaos-tested payment flow. FastAPI, PostgreSQL, React, WebSockets, Docker.</td><td><code>Python</code></td><td align="right"></td></tr>
-</table>
-</details>
-
 ## Tech stack
 
 <p align="center"><a href="https://skillicons.dev"><img src="https://skillicons.dev/icons?i=py,ts,js,c,cpp,react,nodejs,fastapi,django,postgres,redis,docker,linux,git,tailwind,pytorch&perline=8" alt="py, ts, js, c, cpp, react, nodejs, fastapi, django, postgres, redis, docker, linux, git, tailwind, pytorch"></a></p>
@@ -164,6 +164,13 @@ Most of my work is full-stack, using **Python/FastAPI** or **TypeScript/React**,
 <p align="center">
 <a href="https://github.com/arafatsheikh098?tab=repositories"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/stats-dark.svg"><img src="assets/stats-light.svg" alt="GitHub stats" width="49%"></picture></a>
 <a href="https://codeforces.com/profile/arafatsheikh098"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/codeforces-dark.svg"><img src="assets/codeforces-light.svg" alt="Codeforces rating" width="49%"></picture></a>
+</p>
+
+## Get in touch
+
+<p align="center">
+<a href="https://arafatsheikh098.github.io/"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/nav/website-dark.svg"><img src="assets/nav/website-light.svg" alt="Website"></picture></a>&nbsp;
+<a href="https://codeforces.com/profile/arafatsheikh098"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/nav/codeforces-dark.svg"><img src="assets/nav/codeforces-light.svg" alt="Codeforces"></picture></a>
 </p>
 
 <p align="center"><sub>
