@@ -135,6 +135,15 @@ Most of my work is full-stack, using **Python/FastAPI** or **TypeScript/React**,
 </table>
 </details>
 
+<details>
+<summary><b>More</b> &nbsp;<sub>2 repos</sub></summary>
+<br>
+<table>
+<tr><td><a href="https://github.com/arafatsheikh098/learnai"><b>learnai</b></a></td><td>Learn Machine Learning &amp; Deep Learning by playing with it — 20 interactive lessons in plain words, live visuals, quizzes. Free, no sign-up, works offline.</td><td><code>HTML</code></td><td align="right"></td></tr>
+<tr><td><a href="https://github.com/arafatsheikh098/bus-ticket-booking"><b>bus-ticket-booking</b></a></td><td>Intercity bus ticket booking for Bangladesh: live seat maps, 5-minute seat holds with Postgres row locks, and a chaos-tested payment flow. FastAPI, PostgreSQL, React, WebSockets, Docker.</td><td><code>Python</code></td><td align="right"></td></tr>
+</table>
+</details>
+
 ## Tech stack
 
 <p align="center"><a href="https://skillicons.dev"><img src="https://skillicons.dev/icons?i=py,ts,js,c,cpp,react,nodejs,fastapi,django,postgres,redis,docker,linux,git,tailwind,pytorch&perline=8" alt="py, ts, js, c, cpp, react, nodejs, fastapi, django, postgres, redis, docker, linux, git, tailwind, pytorch"></a></p>
@@ -159,5 +168,5 @@ Most of my work is full-stack, using **Python/FastAPI** or **TypeScript/React**,
 
 <p align="center"><sub>
 ✨ Like this profile? It's a template. Open <a href="https://github.com/arafatsheikh098/arafatsheikh098"><b>arafatsheikh098/arafatsheikh098</b></a>, click <b>Use this template</b>, edit <code>profile.yml</code>, and the daily Action builds yours.
-<br>Cards are drawn from live GitHub &amp; Codeforces data · last refreshed 25 Nov 2026
+<br>Cards are drawn from live GitHub &amp; Codeforces data · last refreshed 26 Nov 2026
 </sub></p>
