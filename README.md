@@ -175,5 +175,5 @@ Most of my work is full-stack, using **Python/FastAPI** or **TypeScript/React**,
 
 <p align="center"><sub>
 ✨ Like this profile? It's a template. Open <a href="https://github.com/arafatsheikh098/arafatsheikh098"><b>arafatsheikh098/arafatsheikh098</b></a>, click <b>Use this template</b>, edit <code>profile.yml</code>, and the daily Action builds yours.
-<br>Cards are drawn from live GitHub &amp; Codeforces data · last refreshed 26 Nov 2026
+<br>Cards are drawn from live GitHub &amp; Codeforces data · last refreshed 27 Nov 2026
 </sub></p>
